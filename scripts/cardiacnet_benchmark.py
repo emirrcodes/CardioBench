@@ -72,7 +72,7 @@ def embed(model: str, task: str, split_csv: Path, emb_dir: Path, args) -> None:
                "--root", "/", "--split_csv", split_csv, "--split", split,
                "--out_dir", emb_dir / split, "--model", model, "--device", args.device,
                "--precision", args.precision, "--max_frames", args.max_frames,
-               "--batch_size", args.batch_size]
+               "--batch_size", args.batch_size, "--sampling", args.sampling]
         if args.device == "cpu":
             cmd += ["--no_pin_memory", "--no_channels_last"]
         sh(cmd)
@@ -105,16 +105,35 @@ def probe(model: str, task: str, split_csv: Path, emb_dir: Path, pooling: str,
         "--curve_csv", curve_path])
 
 
+def write_no_phi_gt(out_dir: Path) -> dict:
+    """Ground truth without the ``PHI*`` controls.
+
+    Those 42 clips come from a different source (RGB volumes, grey background, other
+    overlays) and are all negatives, so "is this a PHI file" alone separates classes.
+    Scoring without them shows how much of a model's AUROC is that shortcut.
+    """
+    env = {}
+    for task, (csv_rel, _, _) in TASKS.items():
+        df = pd.read_csv(REPO / csv_rel)
+        out = out_dir / "splits" / f"{task.lower()}_gt_noPHI.csv"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        df[~df["path"].str.contains("/PHI")].to_csv(out, index=False)
+        env[f"CARDIACNET_{task}_GT"] = str(out)
+    return env
+
+
 def summarize(out_dir: Path) -> pd.DataFrame:
     rows = []
-    for task in TASKS:
-        path = out_dir / "eval" / f"{task}.csv"
-        if not path.exists():
-            continue
-        df = pd.read_csv(path)
-        df[["model", "protocol"]] = df["model"].str.split("__", n=1, expand=True)
-        df.insert(0, "task", task)
-        rows.append(df)
+    for test_set, eval_dir in (("all", "eval"), ("noPHI", "eval_noPHI")):
+        for task in TASKS:
+            path = out_dir / eval_dir / f"{task}.csv"
+            if not path.exists() or path.stat().st_size < 5:
+                continue
+            df = pd.read_csv(path)
+            df[["model", "protocol"]] = df["model"].str.split("__", n=1, expand=True)
+            df.insert(0, "test_set", test_set)
+            df.insert(0, "task", task)
+            rows.append(df)
     summary = pd.concat(rows, ignore_index=True)
     summary.to_csv(out_dir / "summary.csv", index=False)
     return summary
@@ -129,7 +148,16 @@ def plot(out_dir: Path, summary: pd.DataFrame) -> None:
     fig_dir = out_dir / "figures"
     fig_dir.mkdir(exist_ok=True)
 
-    # 1) AUROC with bootstrap 95% CI, per task / model / protocol.
+    # 1) AUROC with bootstrap 95% CI, per task / model / protocol, for each test set.
+    for test_set in summary["test_set"].unique():
+        _plot_auroc(summary[summary["test_set"] == test_set], test_set,
+                    fig_dir / f"auroc_by_protocol{'' if test_set == 'all' else '_' + test_set}.png")
+    _plot_curves(out_dir, fig_dir)
+
+
+def _plot_auroc(summary: pd.DataFrame, test_set: str, path: Path) -> None:
+    import matplotlib.pyplot as plt
+
     fig, axes = plt.subplots(1, len(TASKS), figsize=(6 * len(TASKS), 4), sharey=True)
     for ax, task in zip(axes, TASKS):
         d = summary[summary["task"] == task]
@@ -145,11 +173,16 @@ def plot(out_dir: Path, summary: pd.DataFrame) -> None:
         ax.set_xticks(range(len(models)), models)
         ax.axhline(50, color="grey", lw=0.8, ls="--")
         ax.legend(fontsize=8, loc="lower right")
-        ax.set_title(f"CardiacNet-{task} (test)")
+        ax.set_title(f"CardiacNet-{task} (test, {test_set})")
         ax.set_ylabel("AUROC (%)")
         ax.set_ylim(30, 100)
     fig.tight_layout()
-    fig.savefig(fig_dir / "auroc_by_protocol.png", dpi=150)
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+
+
+def _plot_curves(out_dir: Path, fig_dir: Path) -> None:
+    import matplotlib.pyplot as plt
 
     # 2) Label efficiency: test AUROC vs. share of labelled training videos.
     curves = []
@@ -189,6 +222,8 @@ def main() -> None:
     p.add_argument("--batch_size", default="64")
     p.add_argument("--fractions", nargs="+", default=["0.05", "0.1", "0.25", "0.5", "1.0"])
     p.add_argument("--seeds", nargs="+", default=["0", "1", "2", "3", "4"])
+    p.add_argument("--sampling", choices=["consecutive", "uniform"], default="consecutive",
+                   help="first --max_frames frames, or --max_frames spread over the clip")
     p.add_argument("--skip_zero_shot", action="store_true")
     args = p.parse_args()
 
@@ -211,11 +246,14 @@ def main() -> None:
 
     sh([sys.executable, "evaluation/cardiacnet.py"],
        CARDIACNET_PRED_ROOT=str(pred_root), CARDIACNET_OUT_DIR=str(out_dir / "eval"))
+    sh([sys.executable, "evaluation/cardiacnet.py"],
+       CARDIACNET_PRED_ROOT=str(pred_root), CARDIACNET_OUT_DIR=str(out_dir / "eval_noPHI"),
+       **write_no_phi_gt(out_dir))
     summary = summarize(out_dir)
     plot(out_dir, summary)
-    cols = ["task", "model", "protocol", "n", "AUROC(%)", "AUROC(%)_ci_lo", "AUROC(%)_ci_hi",
+    cols = ["task", "test_set", "model", "protocol", "n", "AUROC(%)", "AUROC(%)_ci_lo", "AUROC(%)_ci_hi",
             "Balanced_Accuracy(%)", "F1(%)"]
-    print(summary[cols].sort_values(["task", "AUROC(%)"], ascending=[True, False]).to_string(index=False))
+    print(summary[cols].sort_values(["task", "test_set", "AUROC(%)"], ascending=[True, True, False]).to_string(index=False))
     print(f"\nResults in {out_dir}")
 
 

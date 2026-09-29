@@ -17,8 +17,8 @@ VIEW_MAP = {
 }
 
 # CARDIACNET
-ASD_GT = "data/splits/cardiacnet/cardiacnet_asd_split.csv"
-PAH_GT = "data/splits/cardiacnet/cardiacnet_pah_split.csv"
+ASD_GT = os.environ.get("CARDIACNET_ASD_GT", "data/splits/cardiacnet/cardiacnet_asd_split.csv")
+PAH_GT = os.environ.get("CARDIACNET_PAH_GT", "data/splits/cardiacnet/cardiacnet_pah_split.csv")
 # Overridable so a notebook can point the evaluator at its own predictions.
 PRED_ROOT = os.environ.get(
     "CARDIACNET_PRED_ROOT", "evaluation/example_predictions/CardiacNet"
