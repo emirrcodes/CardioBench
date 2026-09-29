@@ -134,13 +134,20 @@ def regression_metrics(y: np.ndarray, yhat: np.ndarray) -> Dict[str, float]:
     return out
 
 
-def classification_metrics(y_true, y_pred_labels, average="binary") -> Dict[str, float]:
+def classification_metrics(
+    y_true, y_pred_labels, average="binary", y_score=None
+) -> Dict[str, float]:
     out = {}
     labels = np.unique(y_true)
 
     out["Accuracy(%)"] = 100 * accuracy_score(y_true, y_pred_labels)
     out["Balanced_Accuracy(%)"] = 100 * balanced_accuracy_score(y_true, y_pred_labels)
     out["F1(%)"] = 100 * f1_score(y_true, y_pred_labels, labels=labels, average=average)
+    if y_score is not None:
+        # Threshold-free; NaN when a bootstrap resample holds a single class.
+        out["AUROC(%)"] = (
+            100 * roc_auc_score(y_true, y_score) if len(labels) > 1 else np.nan
+        )
     return {k: round(v, 4) for k, v in out.items()}
 
 
@@ -229,9 +236,10 @@ def bootstrap_regression(y, yhat, B=1000, seed=42):
     return out
 
 
-def bootstrap_classification(y_true, y_pred_labels=None, B=1000, seed=42):
+def bootstrap_classification(y_true, y_pred_labels=None, B=1000, seed=42, y_score=None):
+    """Bootstrap label metrics; pass ``y_score`` (P(positive)) to add AUROC."""
     rng = np.random.default_rng(seed)
-    base = classification_metrics(y_true, y_pred_labels, average="macro")
+    base = classification_metrics(y_true, y_pred_labels, average="macro", y_score=y_score)
     bags = {k: [] for k in base.keys()}
     n = len(y_true)
     for _ in range(B):
@@ -240,15 +248,16 @@ def bootstrap_classification(y_true, y_pred_labels=None, B=1000, seed=42):
             y_true[idx],
             None if y_pred_labels is None else y_pred_labels[idx],
             average="macro",
+            y_score=None if y_score is None else y_score[idx],
         )
         for k, v in m.items():
             bags[k].append(v)
 
     def _ci(x, alpha=0.05):
         return (
-            round(float(np.mean(x)), 4),
-            round(float(np.quantile(x, alpha / 2)), 4),
-            round(float(np.quantile(x, 1 - alpha / 2)), 4),
+            round(float(np.nanmean(x)), 4),
+            round(float(np.nanquantile(x, alpha / 2)), 4),
+            round(float(np.nanquantile(x, 1 - alpha / 2)), 4),
         )
 
     out = {}

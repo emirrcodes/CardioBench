@@ -37,8 +37,11 @@ for model_name, pred_path in sorted(ASD_MODELS.items()):
         raise ValueError(f"{pred_path} must have columns: unique_id, asd_pred")
 
     # ------------------- JOIN PREDICTIONS WITH GT -------------------
+    prob_cols = ["prob_asd"] if "prob_asd" in pred.columns else []
     merged = safe_join(
-        test_df[["unique_id", "ASD"]], pred[["unique_id", "asd_pred"]], key="unique_id"
+        test_df[["unique_id", "ASD"]],
+        pred[["unique_id", "asd_pred"] + prob_cols],
+        key="unique_id",
     )
     if merged.empty:
         print(f"[WARN] No overlap for {model_name} on TEST split.")
@@ -54,18 +57,28 @@ for model_name, pred_path in sorted(ASD_MODELS.items()):
         .replace([np.inf, -np.inf], np.nan)
         .to_numpy()
     )
+    score = (
+        pd.to_numeric(merged["prob_asd"], errors="coerce").to_numpy()
+        if prob_cols
+        else None
+    )
     keep = ~np.isnan(yhat)
+    if score is not None:
+        keep &= ~np.isnan(score)
     if (~keep).any():
         print(
             f"[WARN] {model_name}: dropped {(~keep).sum()} rows with NaN/inf ASD_pred"
         )
     y, yhat = y[keep], yhat[keep]
+    score = None if score is None else score[keep]
 
     # ------------------- COMPUTE METRICS with BOOTSTRAP -------------------
-    stats_boot = bootstrap_classification(y, yhat, B=B, seed=SEED)
+    stats_boot = bootstrap_classification(y, yhat, B=B, seed=SEED, y_score=score)
     asd_rows.append({"model": model_name, "n": len(y), **stats_boot})
 
-asd_metrics = pd.DataFrame(asd_rows).sort_values("model")
+asd_metrics = (
+    pd.DataFrame(asd_rows).sort_values("model") if asd_rows else pd.DataFrame()
+)
 
 # ---------------------------- PAH EVALUATION ----------------------------
 pah_gt = pd.read_csv(PAH_GT)
@@ -88,8 +101,11 @@ for model_name, pred_path in sorted(PAH_MODELS.items()):
         raise ValueError(f"{pred_path} must have columns: unique_id, pah_pred")
 
     # ------------------- JOIN PREDICTIONS WITH GT -------------------
+    prob_cols = ["prob_pah"] if "prob_pah" in pred.columns else []
     merged = safe_join(
-        test_df[["unique_id", "PAH"]], pred[["unique_id", "pah_pred"]], key="unique_id"
+        test_df[["unique_id", "PAH"]],
+        pred[["unique_id", "pah_pred"] + prob_cols],
+        key="unique_id",
     )
     if merged.empty:
         print(f"[WARN] No overlap for {model_name} on TEST split.")
@@ -105,18 +121,28 @@ for model_name, pred_path in sorted(PAH_MODELS.items()):
         .replace([np.inf, -np.inf], np.nan)
         .to_numpy()
     )
+    score = (
+        pd.to_numeric(merged["prob_pah"], errors="coerce").to_numpy()
+        if prob_cols
+        else None
+    )
     keep = ~np.isnan(yhat)
+    if score is not None:
+        keep &= ~np.isnan(score)
     if (~keep).any():
         print(
             f"[WARN] {model_name}: dropped {(~keep).sum()} rows with NaN/inf PAH_pred"
         )
     y, yhat = y[keep], yhat[keep]
+    score = None if score is None else score[keep]
 
     # ------------------- COMPUTE METRICS with BOOTSTRAP -------------------
-    stats_boot = bootstrap_classification(y, yhat, B=B, seed=SEED)
+    stats_boot = bootstrap_classification(y, yhat, B=B, seed=SEED, y_score=score)
     pah_rows.append({"model": model_name, "n": len(y), **stats_boot})
 
-pah_metrics = pd.DataFrame(pah_rows).sort_values("model")
+pah_metrics = (
+    pd.DataFrame(pah_rows).sort_values("model") if pah_rows else pd.DataFrame()
+)
 
 # ---------------------------- VIEW EVALUATION ----------------------------
 view_rows = []

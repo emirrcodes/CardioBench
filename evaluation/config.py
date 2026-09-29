@@ -1,3 +1,5 @@
+import os
+
 # GENERAL
 B = 1000
 SEED = 42
@@ -17,8 +19,13 @@ VIEW_MAP = {
 # CARDIACNET
 ASD_GT = "data/splits/cardiacnet/cardiacnet_asd_split.csv"
 PAH_GT = "data/splits/cardiacnet/cardiacnet_pah_split.csv"
-PRED_ROOT = "evaluation/example_predictions/CardiacNet"
-CARDIACNET_OUT_DIR = "evaluation/output/CardiacNet/"
+# Overridable so a notebook can point the evaluator at its own predictions.
+PRED_ROOT = os.environ.get(
+    "CARDIACNET_PRED_ROOT", "evaluation/example_predictions/CardiacNet"
+)
+CARDIACNET_OUT_DIR = os.environ.get(
+    "CARDIACNET_OUT_DIR", "evaluation/output/CardiacNet/"
+)
 
 # ECHONET DYNAMIC
 GT_ECHONET_DYNAMIC = "data/splits/EchoNet-Dynamic/FileList.csv"
