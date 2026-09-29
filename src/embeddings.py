@@ -10,7 +10,7 @@ import torch.nn.functional as F
 
 from .datasets import DatasetLoader, DatasetItem
 from .models import ModelConfig, load_model
-from .video import read_video, preprocess_frames, encode_video_clip_batched, indices_after_keyframe
+from .video import read_clip, preprocess_frames, encode_video_clip_batched
 
 
 @dataclass
@@ -137,12 +137,15 @@ def generate_embeddings(
             kf = key_map.get(video_id, kf_default)
 
             try:
-                frames = read_video(item.path, res=(cfg.res, cfg.res))
-                n_raw = int(frames.shape[0])
-                sel_indices = indices_after_keyframe(n_raw, int(kf), cfg.max_frames, cfg.stride)
+                frames_sel, n_raw, sel_indices = read_clip(
+                    item.path,
+                    res=(cfg.res, cfg.res),
+                    key_frame=int(kf),
+                    max_frames=cfg.max_frames,
+                    stride=cfg.stride,
+                )
                 if not sel_indices:
                     raise RuntimeError(f"No frames selected (n_raw={n_raw}, key_frame={kf}).")
-                frames_sel = frames[sel_indices]
                 frames_tensor = preprocess_frames(frames_sel, preprocess_val)
                 per_frame = encode_video_clip_batched(
                     model=model,

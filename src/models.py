@@ -9,6 +9,8 @@ from open_clip import create_model_and_transforms
 MODEL_ALIASES: Dict[str, str] = {
     "echo_clip": "hf-hub:mkaichristensen/echo-clip",
     "biomed_clip": "hf-hub:microsoft/BiomedCLIP-PubMedBERT_256-vit_base_patch16_224",
+    # General-purpose baseline; needs open_clip_torch>=2.31.
+    "siglip2": "hf-hub:timm/ViT-B-16-SigLIP2",
 }
 
 

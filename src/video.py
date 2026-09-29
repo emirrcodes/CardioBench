@@ -122,12 +122,54 @@ def read_video(path: Path, res: Optional[Tuple[int, int]] = None) -> np.ndarray:
     raise ValueError(f"Unsupported video type for {path}")
 
 
+def _is_nifti(path: Path) -> bool:
+    name = path.name.lower()
+    return name.endswith(".nii.gz") or path.suffix.lower() == ".nii"
+
+
+def read_clip(
+    path: Path,
+    *,
+    res: Optional[Tuple[int, int]] = None,
+    key_frame: int = 0,
+    max_frames: int = 16,
+    stride: int = 1,
+) -> Tuple[np.ndarray, int, List[int]]:
+    """
+    Read only the frames selected by ``indices_after_keyframe``.
+
+    Returns ``(frames, n_frames_raw, selected_indices)``. NIfTI volumes are memory-mapped,
+    so only the selected slices are decoded instead of the whole cine (CardiacNet
+    volumes are ~100 MB each). Other formats fall back to a full read.
+    """
+    if _is_nifti(path):
+        img = nib.load(str(path))
+        if len(img.shape) > 2:
+            n_raw = int(img.shape[-1])
+            sel = indices_after_keyframe(n_raw, key_frame, max_frames, stride)
+            frames: List[np.ndarray] = []
+            for idx in sel:
+                frame = _normalize_slice(np.asarray(img.dataobj[..., idx]))
+                if res is not None:
+                    frame = crop_and_scale(frame, res)
+                frames.append(frame)
+            if not frames:
+                return np.empty((0,)), n_raw, sel
+            return np.stack(frames, axis=0), n_raw, sel
+
+    frames_all = read_video(path, res=res)
+    n_raw = int(frames_all.shape[0])
+    sel = indices_after_keyframe(n_raw, key_frame, max_frames, stride)
+    return frames_all[sel], n_raw, sel
+
+
 def preprocess_frames(frames: np.ndarray, preprocess_val) -> torch.Tensor:
     to_pil = T.ToPILImage()
     tensors = [preprocess_val(to_pil(frame)) for frame in frames]
     return torch.stack(tensors, dim=0)
 
 
+@torch.inference_mode()
 def encode_video_clip_batched(
     model,
     frames_tensor: torch.Tensor,
@@ -227,6 +269,7 @@ def save_sample_frames(
 __all__ = [
     "crop_and_scale",
     "read_video",
+    "read_clip",
     "preprocess_frames",
     "encode_video_clip_batched",
     "indices_after_keyframe",

@@ -32,11 +32,15 @@ def encode_text_prompts(prompts: List[str], *, model_id: str, device: str, preci
 
     toks = None
     if _oc_get_tokenizer is not None:
-        try:
-            tokenizer = _oc_get_tokenizer(name)
-            toks = tokenizer(prompts)
-        except Exception:
-            toks = None
+        # Try the full hf-hub id first: open_clip then reads the tokenizer from the model's
+        # own config (needed for SigLIP/SigLIP2, whose tokenizer is not the CLIP BPE one).
+        for tok_name in dict.fromkeys([resolved_id, name]):
+            try:
+                tokenizer = _oc_get_tokenizer(tok_name)
+                toks = tokenizer(prompts)
+                break
+            except Exception:
+                toks = None
     if toks is None and any(s in name.lower() for s in ["biomedclip", "pubmedbert", "bert"]):
         try:
             from transformers import AutoTokenizer  # type: ignore
