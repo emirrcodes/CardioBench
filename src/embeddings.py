@@ -27,6 +27,7 @@ class EmbeddingConfig:
     overwrite: bool = False
     key_frame: int = 0
     normalize: bool = True
+    sampling: str = "consecutive"        # consecutive | uniform (see video.select_frame_indices)
 
 
 def _select_video_id(dataset: str, item: DatasetItem) -> str:
@@ -108,6 +109,7 @@ def generate_embeddings(
                 f"stride={cfg.stride}",
                 f"batch_size={cfg.batch_size}",
                 f"normalize={cfg.normalize}",
+                f"sampling={cfg.sampling}",
             ])
         )
 
@@ -143,6 +145,7 @@ def generate_embeddings(
                     key_frame=int(kf),
                     max_frames=cfg.max_frames,
                     stride=cfg.stride,
+                    sampling=cfg.sampling,
                 )
                 if not sel_indices:
                     raise RuntimeError(f"No frames selected (n_raw={n_raw}, key_frame={kf}).")
@@ -223,6 +226,7 @@ def main():
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--key_frame", type=int, default=0)
     parser.add_argument("--no_normalize", dest="normalize", action="store_false")
+    parser.add_argument("--sampling", choices=["consecutive", "uniform"], default="consecutive")
     args = parser.parse_args()
 
     cfg = EmbeddingConfig(
@@ -238,6 +242,7 @@ def main():
         overwrite=args.overwrite,
         key_frame=args.key_frame,
         normalize=bool(getattr(args, "normalize", True)),
+        sampling=args.sampling,
     )
 
     if args.splits:

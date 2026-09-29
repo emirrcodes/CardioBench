@@ -74,27 +74,44 @@ def _normalize_slice(arr: np.ndarray) -> np.ndarray:
     return arr
 
 
+def _nifti_layout(shape: Sequence[int]) -> Tuple[int, bool]:
+    """Return ``(n_frames, is_rgb)`` for a NIfTI cine.
+
+    Most volumes are ``(H, W, T)``; some CardiacNet controls (the ``PHI*`` files) are
+    ``(H, W, T, 3)`` RGB. Treating the last axis as time there yields 3 "frames" that are
+    the colour channels of a single mid-clip image, and since those files are all
+    negatives the probe can learn the file format instead of the pathology.
+    """
+    if len(shape) == 4 and shape[-1] in (3, 4):
+        return int(shape[2]), True
+    if len(shape) == 2:
+        return 1, False
+    return int(shape[-1]), False
+
+
+def _nifti_frame(dataobj, shape: Sequence[int], idx: int, is_rgb: bool) -> np.ndarray:
+    if len(shape) == 2:
+        return _normalize_slice(np.asarray(dataobj))
+    if is_rgb:
+        rgb = np.asarray(dataobj[:, :, idx, :3], dtype=np.float32)
+        # Luminance, so these clips look like the grayscale cines of every other video.
+        gray = rgb @ np.array([0.299, 0.587, 0.114], dtype=np.float32)
+        return _normalize_slice(gray)
+    return _normalize_slice(np.asarray(dataobj[..., idx]))
+
+
 def read_nii(path: Path, res: Optional[Tuple[int, int]] = None) -> np.ndarray:
     """
     Read echocardiography videos in NIfTI format and return as a numpy array of shape (T, H, W, C).
     """
     img = nib.load(str(path))
-    dataobj = img.dataobj
-    shp = img.shape
-
+    n_frames, is_rgb = _nifti_layout(img.shape)
     frames: List[np.ndarray] = []
-    if len(shp) == 2:
-        frame = _normalize_slice(np.asarray(dataobj))
+    for idx in range(n_frames):
+        frame = _nifti_frame(img.dataobj, img.shape, idx, is_rgb)
         if res is not None:
             frame = crop_and_scale(frame, res)
         frames.append(frame)
-    else:
-        T = int(shp[-1])
-        for idx in range(T):
-            frame = _normalize_slice(np.asarray(dataobj[..., idx]))
-            if res is not None:
-                frame = crop_and_scale(frame, res)
-            frames.append(frame)
     return np.stack(frames, axis=0)
 
 
@@ -127,6 +144,22 @@ def _is_nifti(path: Path) -> bool:
     return name.endswith(".nii.gz") or path.suffix.lower() == ".nii"
 
 
+def select_frame_indices(
+    n_frames: int, key_frame: int, max_frames: int, stride: int, sampling: str = "consecutive"
+) -> List[int]:
+    """``consecutive``: ``max_frames`` frames from ``key_frame`` on (the original behaviour,
+    ~0.5 s of a 30-50 fps cine). ``uniform``: ``max_frames`` frames spread evenly over the
+    whole clip, so the embedding sees every phase of the cardiac cycle."""
+    if sampling == "consecutive":
+        return indices_after_keyframe(n_frames, key_frame, max_frames, stride)
+    if sampling == "uniform":
+        if n_frames <= 0:
+            return []
+        take = min(max_frames, n_frames)
+        return sorted({int(round(x)) for x in np.linspace(0, n_frames - 1, take)})
+    raise ValueError(f"Unknown sampling '{sampling}' (expected consecutive|uniform)")
+
+
 def read_clip(
     path: Path,
     *,
@@ -134,9 +167,10 @@ def read_clip(
     key_frame: int = 0,
     max_frames: int = 16,
     stride: int = 1,
+    sampling: str = "consecutive",
 ) -> Tuple[np.ndarray, int, List[int]]:
     """
-    Read only the frames selected by ``indices_after_keyframe``.
+    Read only the frames selected by ``select_frame_indices``.
 
     Returns ``(frames, n_frames_raw, selected_indices)``. NIfTI volumes are memory-mapped,
     so only the selected slices are decoded instead of the whole cine (CardiacNet
@@ -144,22 +178,21 @@ def read_clip(
     """
     if _is_nifti(path):
         img = nib.load(str(path))
-        if len(img.shape) > 2:
-            n_raw = int(img.shape[-1])
-            sel = indices_after_keyframe(n_raw, key_frame, max_frames, stride)
-            frames: List[np.ndarray] = []
-            for idx in sel:
-                frame = _normalize_slice(np.asarray(img.dataobj[..., idx]))
-                if res is not None:
-                    frame = crop_and_scale(frame, res)
-                frames.append(frame)
-            if not frames:
-                return np.empty((0,)), n_raw, sel
-            return np.stack(frames, axis=0), n_raw, sel
+        n_raw, is_rgb = _nifti_layout(img.shape)
+        sel = select_frame_indices(n_raw, key_frame, max_frames, stride, sampling)
+        frames: List[np.ndarray] = []
+        for idx in sel:
+            frame = _nifti_frame(img.dataobj, img.shape, idx, is_rgb)
+            if res is not None:
+                frame = crop_and_scale(frame, res)
+            frames.append(frame)
+        if not frames:
+            return np.empty((0,)), n_raw, sel
+        return np.stack(frames, axis=0), n_raw, sel
 
     frames_all = read_video(path, res=res)
     n_raw = int(frames_all.shape[0])
-    sel = indices_after_keyframe(n_raw, key_frame, max_frames, stride)
+    sel = select_frame_indices(n_raw, key_frame, max_frames, stride, sampling)
     return frames_all[sel], n_raw, sel
 
 
@@ -270,6 +303,7 @@ __all__ = [
     "crop_and_scale",
     "read_video",
     "read_clip",
+    "select_frame_indices",
     "preprocess_frames",
     "encode_video_clip_batched",
     "indices_after_keyframe",
