@@ -59,6 +59,15 @@ Use the CSVs inside `evaluation/example_predictions/` as templates.
 
 ## Baselines & Protocols
 - `src/` contains code for zero-shot similarity, language-aligned prompting, and linear probes on top of frozen encoders.
+- `src/linear_probe/embedding_probe.py` fits linear probes directly on the cached `.pt` embeddings (seconds on CPU instead of re-encoding every video each epoch). Regularisation and the binary decision threshold are chosen on the val split; `--train_fractions` / `--seeds` produce a label-efficiency curve and `--pooling meanstd` adds frame-to-frame variation to the mean embedding.
+
+## Running on Kaggle (CardiacNet)
+CardiacNet's videos are hosted on Kaggle, so the whole zero-shot + probe benchmark for ASD and PAH runs on a free Kaggle GPU:
+
+1. Open [`notebooks/kaggle_cardiacnet.ipynb`](notebooks/kaggle_cardiacnet.ipynb) in Kaggle, add the `xiaoweixumedicalai/abnormcardiacechovideos` input, enable GPU + Internet.
+2. *Run All*. It calls `scripts/cardiacnet_benchmark.py`, which embeds each split once per model (`echo_clip`, `biomed_clip`, `siglip2`), runs zero-shot and both probes, and scores everything with `evaluation/cardiacnet.py` (now also reporting AUROC with bootstrap CIs when a `prob_<task>` column is present).
+
+The same script runs locally: `python scripts/cardiacnet_benchmark.py --data_root <dir containing CardiacNet/> --out_dir runs/cardiacnet`.
 
 ## Contributing
 Contributions are welcome! Please open an issue or pull request for:
