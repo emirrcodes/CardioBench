@@ -18,3 +18,5 @@ data/splits/echonet_pediatric_filelist.csv
 # eval
 evaluation/output
 evaluation/embeddings
+# local working files (venv, Kaggle kernel/outputs, page sources)
+.work/

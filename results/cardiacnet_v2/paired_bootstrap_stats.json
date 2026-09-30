@@ -1,0 +1,1096 @@
+{
+ "ASD": {
+  "n": 47,
+  "n_phi": 5,
+  "n_pos": 20,
+  "res": {
+   "consecutive|biomed_clip__probe-meanstd": {
+    "all": 64.8,
+    "all_ci": [
+     48.5,
+     79.8
+    ],
+    "nophi": 58.6,
+    "nophi_ci": [
+     41.2,
+     76.9
+    ],
+    "bal": 62.9,
+    "bal_nophi": 58.4,
+    "drop": 6.1,
+    "drop_ci": [
+     0.9,
+     13.0
+    ],
+    "drop_p": 0.02
+   },
+   "consecutive|biomed_clip__probe": {
+    "all": 70.9,
+    "all_ci": [
+     55.6,
+     85.9
+    ],
+    "nophi": 64.5,
+    "nophi_ci": [
+     46.2,
+     81.9
+    ],
+    "bal": 56.5,
+    "bal_nophi": 52.3,
+    "drop": 6.4,
+    "drop_ci": [
+     1.5,
+     13.3
+    ],
+    "drop_p": 0.008
+   },
+   "consecutive|biomed_clip__zeroshot": {
+    "all": 56.5,
+    "all_ci": [
+     37.9,
+     72.9
+    ],
+    "nophi": 50.9,
+    "nophi_ci": [
+     33.6,
+     68.2
+    ],
+    "bal": 50.7,
+    "bal_nophi": 48.6,
+    "drop": 5.4,
+    "drop_ci": [
+     1.3,
+     11.3
+    ],
+    "drop_p": 0.008
+   },
+   "consecutive|echo_clip__probe-meanstd": {
+    "all": 63.5,
+    "all_ci": [
+     45.5,
+     78.9
+    ],
+    "nophi": 57.7,
+    "nophi_ci": [
+     38.6,
+     76.0
+    ],
+    "bal": 59.7,
+    "bal_nophi": 55.7,
+    "drop": 5.7,
+    "drop_ci": [
+     0.0,
+     13.3
+    ],
+    "drop_p": 0.054
+   },
+   "consecutive|echo_clip__probe": {
+    "all": 66.3,
+    "all_ci": [
+     49.1,
+     82.4
+    ],
+    "nophi": 58.6,
+    "nophi_ci": [
+     40.3,
+     75.7
+    ],
+    "bal": 66.0,
+    "bal_nophi": 58.9,
+    "drop": 7.6,
+    "drop_ci": [
+     1.7,
+     15.1
+    ],
+    "drop_p": 0.008
+   },
+   "consecutive|echo_clip__zeroshot": {
+    "all": 39.8,
+    "all_ci": [
+     22.9,
+     57.5
+    ],
+    "nophi": 37.5,
+    "nophi_ci": [
+     21.3,
+     55.4
+    ],
+    "bal": 42.8,
+    "bal_nophi": 42.3,
+    "drop": 2.4,
+    "drop_ci": [
+     -3.0,
+     8.7
+    ],
+    "drop_p": 0.37
+   },
+   "consecutive|siglip2__probe-meanstd": {
+    "all": 68.3,
+    "all_ci": [
+     51.6,
+     83.1
+    ],
+    "nophi": 64.8,
+    "nophi_ci": [
+     48.0,
+     82.4
+    ],
+    "bal": 64.1,
+    "bal_nophi": 60.5,
+    "drop": 3.6,
+    "drop_ci": [
+     -0.0,
+     9.3
+    ],
+    "drop_p": 0.06
+   },
+   "consecutive|siglip2__probe": {
+    "all": 68.1,
+    "all_ci": [
+     50.9,
+     82.5
+    ],
+    "nophi": 61.6,
+    "nophi_ci": [
+     43.4,
+     78.9
+    ],
+    "bal": 61.6,
+    "bal_nophi": 55.7,
+    "drop": 6.5,
+    "drop_ci": [
+     1.6,
+     14.2
+    ],
+    "drop_p": 0.008
+   },
+   "consecutive|siglip2__zeroshot": {
+    "all": 40.7,
+    "all_ci": [
+     25.3,
+     57.9
+    ],
+    "nophi": 40.9,
+    "nophi_ci": [
+     24.8,
+     59.7
+    ],
+    "bal": 50.0,
+    "bal_nophi": 50.0,
+    "drop": -0.1,
+    "drop_ci": [
+     -4.8,
+     4.5
+    ],
+    "drop_p": 0.932
+   },
+   "uniform|biomed_clip__probe-meanstd": {
+    "all": 70.9,
+    "all_ci": [
+     55.1,
+     85.3
+    ],
+    "nophi": 65.5,
+    "nophi_ci": [
+     49.6,
+     82.5
+    ],
+    "bal": 72.7,
+    "bal_nophi": 69.3,
+    "drop": 5.5,
+    "drop_ci": [
+     1.0,
+     11.7
+    ],
+    "drop_p": 0.012
+   },
+   "uniform|biomed_clip__probe": {
+    "all": 70.2,
+    "all_ci": [
+     54.0,
+     84.1
+    ],
+    "nophi": 65.7,
+    "nophi_ci": [
+     49.0,
+     82.8
+    ],
+    "bal": 57.0,
+    "bal_nophi": 54.1,
+    "drop": 4.4,
+    "drop_ci": [
+     -0.5,
+     10.4
+    ],
+    "drop_p": 0.096
+   },
+   "uniform|biomed_clip__zeroshot": {
+    "all": 64.3,
+    "all_ci": [
+     47.8,
+     78.6
+    ],
+    "nophi": 60.5,
+    "nophi_ci": [
+     41.9,
+     77.1
+    ],
+    "bal": 56.3,
+    "bal_nophi": 55.5,
+    "drop": 3.6,
+    "drop_ci": [
+     -1.7,
+     9.9
+    ],
+    "drop_p": 0.178
+   },
+   "uniform|echo_clip__probe-meanstd": {
+    "all": 65.6,
+    "all_ci": [
+     50.0,
+     80.5
+    ],
+    "nophi": 60.0,
+    "nophi_ci": [
+     41.5,
+     76.7
+    ],
+    "bal": 53.8,
+    "bal_nophi": 53.0,
+    "drop": 5.6,
+    "drop_ci": [
+     1.1,
+     11.6
+    ],
+    "drop_p": 0.008
+   },
+   "uniform|echo_clip__probe": {
+    "all": 65.2,
+    "all_ci": [
+     46.7,
+     82.2
+    ],
+    "nophi": 57.3,
+    "nophi_ci": [
+     38.4,
+     76.4
+    ],
+    "bal": 67.9,
+    "bal_nophi": 61.1,
+    "drop": 7.8,
+    "drop_ci": [
+     1.8,
+     16.0
+    ],
+    "drop_p": 0.008
+   },
+   "uniform|echo_clip__zeroshot": {
+    "all": 38.1,
+    "all_ci": [
+     21.8,
+     54.3
+    ],
+    "nophi": 36.8,
+    "nophi_ci": [
+     20.4,
+     54.2
+    ],
+    "bal": 43.4,
+    "bal_nophi": 42.5,
+    "drop": 1.4,
+    "drop_ci": [
+     -3.8,
+     7.5
+    ],
+    "drop_p": 0.606
+   },
+   "uniform|siglip2__probe-meanstd": {
+    "all": 82.0,
+    "all_ci": [
+     68.1,
+     92.9
+    ],
+    "nophi": 78.0,
+    "nophi_ci": [
+     62.9,
+     93.3
+    ],
+    "bal": 84.5,
+    "bal_nophi": 81.6,
+    "drop": 4.1,
+    "drop_ci": [
+     0.8,
+     10.0
+    ],
+    "drop_p": 0.01
+   },
+   "uniform|siglip2__probe": {
+    "all": 79.4,
+    "all_ci": [
+     63.7,
+     91.3
+    ],
+    "nophi": 74.8,
+    "nophi_ci": [
+     57.7,
+     88.6
+    ],
+    "bal": 74.1,
+    "bal_nophi": 68.2,
+    "drop": 4.7,
+    "drop_ci": [
+     1.0,
+     10.4
+    ],
+    "drop_p": 0.008
+   },
+   "uniform|siglip2__zeroshot": {
+    "all": 33.7,
+    "all_ci": [
+     19.0,
+     50.2
+    ],
+    "nophi": 34.5,
+    "nophi_ci": [
+     18.8,
+     53.4
+    ],
+    "bal": 50.0,
+    "bal_nophi": 50.0,
+    "drop": -0.8,
+    "drop_ci": [
+     -4.9,
+     4.0
+    ],
+    "drop_p": 0.652
+   }
+  },
+  "comps": {
+   "biomed_clip__probe|all": {
+    "diff": -0.7,
+    "ci": [
+     -9.8,
+     8.2
+    ],
+    "p": 0.898
+   },
+   "biomed_clip__probe|noPHI": {
+    "diff": 1.1,
+    "ci": [
+     -9.7,
+     10.0
+    ],
+    "p": 0.862
+   },
+   "biomed_clip__probe-meanstd|all": {
+    "diff": 6.1,
+    "ci": [
+     -4.5,
+     17.4
+    ],
+    "p": 0.254
+   },
+   "biomed_clip__probe-meanstd|noPHI": {
+    "diff": 6.8,
+    "ci": [
+     -5.6,
+     19.3
+    ],
+    "p": 0.31
+   },
+   "biomed_clip__zeroshot|all": {
+    "diff": 7.8,
+    "ci": [
+     -1.5,
+     17.3
+    ],
+    "p": 0.112
+   },
+   "biomed_clip__zeroshot|noPHI": {
+    "diff": 9.5,
+    "ci": [
+     0.2,
+     18.5
+    ],
+    "p": 0.042
+   },
+   "echo_clip__probe|all": {
+    "diff": -1.1,
+    "ci": [
+     -7.9,
+     4.0
+    ],
+    "p": 0.742
+   },
+   "echo_clip__probe|noPHI": {
+    "diff": -1.4,
+    "ci": [
+     -8.9,
+     4.8
+    ],
+    "p": 0.77
+   },
+   "echo_clip__probe-meanstd|all": {
+    "diff": 2.0,
+    "ci": [
+     -16.0,
+     20.9
+    ],
+    "p": 0.852
+   },
+   "echo_clip__probe-meanstd|noPHI": {
+    "diff": 2.3,
+    "ci": [
+     -18.8,
+     24.3
+    ],
+    "p": 0.898
+   },
+   "echo_clip__zeroshot|all": {
+    "diff": -1.7,
+    "ci": [
+     -10.0,
+     5.3
+    ],
+    "p": 0.668
+   },
+   "echo_clip__zeroshot|noPHI": {
+    "diff": -0.7,
+    "ci": [
+     -9.3,
+     6.9
+    ],
+    "p": 0.964
+   },
+   "siglip2__probe|all": {
+    "diff": 11.3,
+    "ci": [
+     -2.1,
+     25.1
+    ],
+    "p": 0.102
+   },
+   "siglip2__probe|noPHI": {
+    "diff": 13.2,
+    "ci": [
+     -3.1,
+     30.2
+    ],
+    "p": 0.104
+   },
+   "siglip2__probe-meanstd|all": {
+    "diff": 13.7,
+    "ci": [
+     3.4,
+     25.5
+    ],
+    "p": 0.016
+   },
+   "siglip2__probe-meanstd|noPHI": {
+    "diff": 13.2,
+    "ci": [
+     0.9,
+     26.1
+    ],
+    "p": 0.028
+   },
+   "siglip2__zeroshot|all": {
+    "diff": -7.0,
+    "ci": [
+     -15.7,
+     1.3
+    ],
+    "p": 0.108
+   },
+   "siglip2__zeroshot|noPHI": {
+    "diff": -6.4,
+    "ci": [
+     -17.0,
+     3.6
+    ],
+    "p": 0.2
+   }
+  },
+  "mm": {
+   "uniform|siglip2__probe vs biomed_clip__probe": {
+    "diff": 9.1,
+    "ci": [
+     -12.1,
+     30.7
+    ],
+    "p": 0.396
+   },
+   "uniform|siglip2__probe vs echo_clip__probe": {
+    "diff": 17.5,
+    "ci": [
+     -0.7,
+     36.1
+    ],
+    "p": 0.056
+   },
+   "consecutive|biomed_clip__probe vs echo_clip__probe": {
+    "diff": 5.9,
+    "ci": [
+     -11.7,
+     26.4
+    ],
+    "p": 0.53
+   },
+   "consecutive|biomed_clip__probe vs siglip2__probe": {
+    "diff": 3.0,
+    "ci": [
+     -16.3,
+     22.9
+    ],
+    "p": 0.704
+   }
+  }
+ },
+ "PAH": {
+  "n": 106,
+  "n_phi": 4,
+  "n_pos": 75,
+  "res": {
+   "consecutive|biomed_clip__probe-meanstd": {
+    "all": 74.2,
+    "all_ci": [
+     64.6,
+     83.5
+    ],
+    "nophi": 71.6,
+    "nophi_ci": [
+     59.9,
+     81.0
+    ],
+    "bal": 68.8,
+    "bal_nophi": 68.3,
+    "drop": 2.7,
+    "drop_ci": [
+     0.2,
+     6.1
+    ],
+    "drop_p": 0.044
+   },
+   "consecutive|biomed_clip__probe": {
+    "all": 73.9,
+    "all_ci": [
+     64.0,
+     83.5
+    ],
+    "nophi": 70.7,
+    "nophi_ci": [
+     58.9,
+     80.6
+    ],
+    "bal": 68.5,
+    "bal_nophi": 67.8,
+    "drop": 3.2,
+    "drop_ci": [
+     0.6,
+     7.0
+    ],
+    "drop_p": 0.044
+   },
+   "consecutive|biomed_clip__zeroshot": {
+    "all": 59.2,
+    "all_ci": [
+     48.0,
+     70.0
+    ],
+    "nophi": 56.4,
+    "nophi_ci": [
+     43.4,
+     67.7
+    ],
+    "bal": 50.0,
+    "bal_nophi": 50.0,
+    "drop": 2.7,
+    "drop_ci": [
+     -0.3,
+     6.8
+    ],
+    "drop_p": 0.128
+   },
+   "consecutive|echo_clip__probe-meanstd": {
+    "all": 70.8,
+    "all_ci": [
+     59.9,
+     80.7
+    ],
+    "nophi": 66.5,
+    "nophi_ci": [
+     54.6,
+     78.1
+    ],
+    "bal": 66.5,
+    "bal_nophi": 64.1,
+    "drop": 4.4,
+    "drop_ci": [
+     0.8,
+     9.0
+    ],
+    "drop_p": 0.044
+   },
+   "consecutive|echo_clip__probe": {
+    "all": 69.6,
+    "all_ci": [
+     58.8,
+     79.4
+    ],
+    "nophi": 65.2,
+    "nophi_ci": [
+     53.4,
+     76.8
+    ],
+    "bal": 59.4,
+    "bal_nophi": 54.8,
+    "drop": 4.4,
+    "drop_ci": [
+     0.8,
+     9.3
+    ],
+    "drop_p": 0.044
+   },
+   "consecutive|echo_clip__zeroshot": {
+    "all": 50.1,
+    "all_ci": [
+     36.6,
+     63.2
+    ],
+    "nophi": 55.6,
+    "nophi_ci": [
+     42.0,
+     68.9
+    ],
+    "bal": 48.3,
+    "bal_nophi": 48.5,
+    "drop": -5.5,
+    "drop_ci": [
+     -13.1,
+     0.0
+    ],
+    "drop_p": 0.074
+   },
+   "consecutive|siglip2__probe-meanstd": {
+    "all": 78.0,
+    "all_ci": [
+     69.3,
+     86.1
+    ],
+    "nophi": 75.4,
+    "nophi_ci": [
+     66.4,
+     84.2
+    ],
+    "bal": 71.7,
+    "bal_nophi": 71.5,
+    "drop": 2.6,
+    "drop_ci": [
+     0.3,
+     6.0
+    ],
+    "drop_p": 0.044
+   },
+   "consecutive|siglip2__probe": {
+    "all": 76.9,
+    "all_ci": [
+     67.7,
+     85.0
+    ],
+    "nophi": 74.2,
+    "nophi_ci": [
+     65.0,
+     82.9
+    ],
+    "bal": 74.3,
+    "bal_nophi": 72.9,
+    "drop": 2.8,
+    "drop_ci": [
+     0.4,
+     6.2
+    ],
+    "drop_p": 0.044
+   },
+   "consecutive|siglip2__zeroshot": {
+    "all": 67.8,
+    "all_ci": [
+     55.5,
+     78.1
+    ],
+    "nophi": 71.0,
+    "nophi_ci": [
+     59.3,
+     81.8
+    ],
+    "bal": 50.0,
+    "bal_nophi": 50.0,
+    "drop": -3.2,
+    "drop_ci": [
+     -9.5,
+     1.3
+    ],
+    "drop_p": 0.236
+   },
+   "uniform|biomed_clip__probe-meanstd": {
+    "all": 78.0,
+    "all_ci": [
+     68.4,
+     86.8
+    ],
+    "nophi": 74.8,
+    "nophi_ci": [
+     64.0,
+     84.5
+    ],
+    "bal": 71.3,
+    "bal_nophi": 70.1,
+    "drop": 3.2,
+    "drop_ci": [
+     0.5,
+     7.1
+    ],
+    "drop_p": 0.044
+   },
+   "uniform|biomed_clip__probe": {
+    "all": 77.0,
+    "all_ci": [
+     66.9,
+     86.1
+    ],
+    "nophi": 73.7,
+    "nophi_ci": [
+     62.8,
+     83.1
+    ],
+    "bal": 68.2,
+    "bal_nophi": 67.3,
+    "drop": 3.2,
+    "drop_ci": [
+     0.6,
+     7.1
+    ],
+    "drop_p": 0.044
+   },
+   "uniform|biomed_clip__zeroshot": {
+    "all": 61.1,
+    "all_ci": [
+     49.6,
+     71.8
+    ],
+    "nophi": 58.5,
+    "nophi_ci": [
+     47.5,
+     69.0
+    ],
+    "bal": 54.0,
+    "bal_nophi": 54.0,
+    "drop": 2.6,
+    "drop_ci": [
+     -0.4,
+     6.8
+    ],
+    "drop_p": 0.152
+   },
+   "uniform|echo_clip__probe-meanstd": {
+    "all": 73.6,
+    "all_ci": [
+     62.3,
+     82.7
+    ],
+    "nophi": 69.7,
+    "nophi_ci": [
+     58.0,
+     80.4
+    ],
+    "bal": 66.4,
+    "bal_nophi": 64.5,
+    "drop": 4.0,
+    "drop_ci": [
+     0.7,
+     8.4
+    ],
+    "drop_p": 0.044
+   },
+   "uniform|echo_clip__probe": {
+    "all": 78.3,
+    "all_ci": [
+     67.8,
+     86.6
+    ],
+    "nophi": 75.1,
+    "nophi_ci": [
+     64.3,
+     85.5
+    ],
+    "bal": 68.4,
+    "bal_nophi": 65.3,
+    "drop": 3.2,
+    "drop_ci": [
+     0.6,
+     6.9
+    ],
+    "drop_p": 0.044
+   },
+   "uniform|echo_clip__zeroshot": {
+    "all": 49.4,
+    "all_ci": [
+     36.4,
+     61.8
+    ],
+    "nophi": 56.3,
+    "nophi_ci": [
+     43.2,
+     68.7
+    ],
+    "bal": 48.9,
+    "bal_nophi": 49.2,
+    "drop": -6.9,
+    "drop_ci": [
+     -14.4,
+     -1.3
+    ],
+    "drop_p": 0.044
+   },
+   "uniform|siglip2__probe-meanstd": {
+    "all": 80.3,
+    "all_ci": [
+     72.1,
+     88.3
+    ],
+    "nophi": 78.2,
+    "nophi_ci": [
+     69.0,
+     86.9
+    ],
+    "bal": 69.7,
+    "bal_nophi": 69.5,
+    "drop": 2.1,
+    "drop_ci": [
+     0.2,
+     5.2
+    ],
+    "drop_p": 0.044
+   },
+   "uniform|siglip2__probe": {
+    "all": 72.0,
+    "all_ci": [
+     62.1,
+     81.0
+    ],
+    "nophi": 70.4,
+    "nophi_ci": [
+     60.0,
+     80.4
+    ],
+    "bal": 65.2,
+    "bal_nophi": 62.8,
+    "drop": 1.6,
+    "drop_ci": [
+     -0.5,
+     4.5
+    ],
+    "drop_p": 0.222
+   },
+   "uniform|siglip2__zeroshot": {
+    "all": 68.9,
+    "all_ci": [
+     56.6,
+     79.3
+    ],
+    "nophi": 72.4,
+    "nophi_ci": [
+     60.1,
+     82.9
+    ],
+    "bal": 50.0,
+    "bal_nophi": 50.0,
+    "drop": -3.5,
+    "drop_ci": [
+     -10.6,
+     1.2
+    ],
+    "drop_p": 0.216
+   }
+  },
+  "comps": {
+   "biomed_clip__probe|all": {
+    "diff": 3.1,
+    "ci": [
+     -2.5,
+     8.7
+    ],
+    "p": 0.276
+   },
+   "biomed_clip__probe|noPHI": {
+    "diff": 3.0,
+    "ci": [
+     -3.7,
+     9.3
+    ],
+    "p": 0.342
+   },
+   "biomed_clip__probe-meanstd|all": {
+    "diff": 3.8,
+    "ci": [
+     -2.8,
+     10.5
+    ],
+    "p": 0.258
+   },
+   "biomed_clip__probe-meanstd|noPHI": {
+    "diff": 3.2,
+    "ci": [
+     -4.3,
+     10.7
+    ],
+    "p": 0.368
+   },
+   "biomed_clip__zeroshot|all": {
+    "diff": 1.9,
+    "ci": [
+     -8.3,
+     12.1
+    ],
+    "p": 0.722
+   },
+   "biomed_clip__zeroshot|noPHI": {
+    "diff": 2.1,
+    "ci": [
+     -8.6,
+     12.6
+    ],
+    "p": 0.664
+   },
+   "echo_clip__probe|all": {
+    "diff": 8.6,
+    "ci": [
+     3.2,
+     14.9
+    ],
+    "p": 0.0
+   },
+   "echo_clip__probe|noPHI": {
+    "diff": 9.9,
+    "ci": [
+     3.2,
+     17.1
+    ],
+    "p": 0.0
+   },
+   "echo_clip__probe-meanstd|all": {
+    "diff": 2.8,
+    "ci": [
+     -6.4,
+     11.6
+    ],
+    "p": 0.554
+   },
+   "echo_clip__probe-meanstd|noPHI": {
+    "diff": 3.2,
+    "ci": [
+     -7.7,
+     14.5
+    ],
+    "p": 0.562
+   },
+   "echo_clip__zeroshot|all": {
+    "diff": -0.6,
+    "ci": [
+     -5.5,
+     3.7
+    ],
+    "p": 0.768
+   },
+   "echo_clip__zeroshot|noPHI": {
+    "diff": 0.7,
+    "ci": [
+     -3.9,
+     5.5
+    ],
+    "p": 0.732
+   },
+   "siglip2__probe|all": {
+    "diff": -4.9,
+    "ci": [
+     -13.2,
+     3.3
+    ],
+    "p": 0.25
+   },
+   "siglip2__probe|noPHI": {
+    "diff": -3.8,
+    "ci": [
+     -13.0,
+     5.5
+    ],
+    "p": 0.396
+   },
+   "siglip2__probe-meanstd|all": {
+    "diff": 2.3,
+    "ci": [
+     -5.1,
+     9.7
+    ],
+    "p": 0.534
+   },
+   "siglip2__probe-meanstd|noPHI": {
+    "diff": 2.8,
+    "ci": [
+     -5.3,
+     10.7
+    ],
+    "p": 0.502
+   },
+   "siglip2__zeroshot|all": {
+    "diff": 1.2,
+    "ci": [
+     -4.3,
+     6.6
+    ],
+    "p": 0.73
+   },
+   "siglip2__zeroshot|noPHI": {
+    "diff": 1.5,
+    "ci": [
+     -4.8,
+     7.4
+    ],
+    "p": 0.64
+   }
+  },
+  "mm": {
+   "uniform|echo_clip__probe vs biomed_clip__probe": {
+    "diff": 1.4,
+    "ci": [
+     -9.7,
+     13.9
+    ],
+    "p": 0.83
+   },
+   "uniform|echo_clip__probe vs siglip2__probe": {
+    "diff": 4.7,
+    "ci": [
+     -5.8,
+     14.8
+    ],
+    "p": 0.332
+   },
+   "consecutive|siglip2__probe vs biomed_clip__probe": {
+    "diff": 3.5,
+    "ci": [
+     -7.3,
+     15.5
+    ],
+    "p": 0.542
+   },
+   "consecutive|siglip2__probe vs echo_clip__probe": {
+    "diff": 8.9,
+    "ci": [
+     -3.5,
+     20.9
+    ],
+    "p": 0.144
+   }
+  }
+ }
+}
