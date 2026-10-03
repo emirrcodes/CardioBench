@@ -193,6 +193,10 @@ def fit_probe(
 def run(args: argparse.Namespace) -> pd.DataFrame:
     labels_df = pd.read_csv(args.labels_csv)
     labels_df[args.id_col] = labels_df[args.id_col].astype(str).str.strip()
+    if args.exclude_regex:
+        drop = labels_df[args.exclude_col].astype(str).str.contains(args.exclude_regex, regex=True)
+        print(f"[probe] excluding {int(drop.sum())} rows where {args.exclude_col} ~ {args.exclude_regex!r}")
+        labels_df = labels_df[~drop]
     labels = labels_df.drop_duplicates(args.id_col).set_index(args.id_col)[args.label_col]
     if args.task == "classification":
         labels = labels.dropna().astype(int)
@@ -274,6 +278,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--pred_col", default="pred")
     p.add_argument("--prob_col", default=None)
     p.add_argument("--curve_csv", default=None, help="Per-(fraction, seed) test metrics")
+    p.add_argument("--exclude_col", default="path", help="labels_csv column tested by --exclude_regex")
+    p.add_argument("--exclude_regex", default=None,
+                   help="Drop label rows whose --exclude_col matches (from train, val and test)")
     return p
 
 

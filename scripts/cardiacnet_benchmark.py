@@ -96,13 +96,13 @@ def zero_shot(model: str, task: str, emb_dir: Path, pred_path: Path, args) -> No
 
 
 def probe(model: str, task: str, split_csv: Path, emb_dir: Path, pooling: str,
-          pred_path: Path, curve_path: Path, args) -> None:
+          pred_path: Path, curve_path: Path, args, extra=()) -> None:
     t = task.lower()
     sh([sys.executable, "-m", "src.linear_probe.embedding_probe", "--emb_root", emb_dir,
         "--labels_csv", split_csv, "--label_col", TASKS[task][1], "--pooling", pooling,
         "--pred_col", f"{t}_pred", "--prob_col", f"prob_{t}", "--out_csv", pred_path,
         "--train_fractions", *args.fractions, "--seeds", *args.seeds,
-        "--curve_csv", curve_path])
+        "--curve_csv", curve_path, *extra])
 
 
 def write_no_phi_gt(out_dir: Path) -> dict:
@@ -243,6 +243,11 @@ def main() -> None:
                 probe(model, task, split_csv, emb_dir, pooling,
                       pred_root / task / f"{tag}__{name}.csv",
                       out_dir / "curves" / f"{tag}__{task}__{name}.csv", args)
+                # Same probe trained without the PHI* controls (a separate, all-negative source).
+                probe(model, task, split_csv, emb_dir, pooling,
+                      pred_root / task / f"{tag}__{name}-clean.csv",
+                      out_dir / "curves" / f"{tag}__{task}__{name}-clean.csv", args,
+                      extra=("--exclude_col", "path", "--exclude_regex", "/PHI"))
 
     sh([sys.executable, "evaluation/cardiacnet.py"],
        CARDIACNET_PRED_ROOT=str(pred_root), CARDIACNET_OUT_DIR=str(out_dir / "eval"))
