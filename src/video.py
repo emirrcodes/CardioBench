@@ -149,7 +149,8 @@ def select_frame_indices(
 ) -> List[int]:
     """``consecutive``: ``max_frames`` frames from ``key_frame`` on (the original behaviour,
     ~0.5 s of a 30-50 fps cine). ``uniform``: ``max_frames`` frames spread evenly over the
-    whole clip, so the embedding sees every phase of the cardiac cycle."""
+    whole clip, so the embedding sees every phase of the cardiac cycle. ``both``: the union
+    of the two, so one embedding pass serves either view (see ``frame_view_positions``)."""
     if sampling == "consecutive":
         return indices_after_keyframe(n_frames, key_frame, max_frames, stride)
     if sampling == "uniform":
@@ -157,7 +158,36 @@ def select_frame_indices(
             return []
         take = min(max_frames, n_frames)
         return sorted({int(round(x)) for x in np.linspace(0, n_frames - 1, take)})
-    raise ValueError(f"Unknown sampling '{sampling}' (expected consecutive|uniform)")
+    if sampling == "both":
+        return sorted(
+            set(select_frame_indices(n_frames, key_frame, max_frames, stride, "consecutive"))
+            | set(select_frame_indices(n_frames, key_frame, max_frames, stride, "uniform"))
+        )
+    raise ValueError(f"Unknown sampling '{sampling}' (expected consecutive|uniform|both)")
+
+
+def frame_view_positions(
+    frame_indices: Sequence[int], n_frames: int, view: str, *, stored_max: int
+) -> List[int]:
+    """Positions into ``frame_indices`` (frames embedded with ``sampling="both"`` and
+    ``max_frames=stored_max``) that make up ``view``, e.g. ``consecutive16`` or ``uniform8``.
+
+    ``consecutiveK``: the first K frames of the clip (K <= stored_max). ``uniformK``: every
+    (stored_max / K)-th frame of the uniform set, so K must divide ``stored_max``.
+    ``all``: every stored frame.
+    """
+    pos = {int(f): i for i, f in enumerate(frame_indices)}
+    if view == "all":
+        return list(range(len(frame_indices)))
+    for kind in ("consecutive", "uniform"):
+        if view.startswith(kind):
+            k = int(view[len(kind):])
+            if k > stored_max or (kind == "uniform" and stored_max % k):
+                raise ValueError(f"view {view} needs K <= {stored_max} (and dividing it for uniform)")
+            target = select_frame_indices(n_frames, 0, stored_max, 1, kind)
+            target = target[:k] if kind == "consecutive" else target[:: stored_max // k]
+            return [pos[f] for f in target if f in pos]
+    raise ValueError(f"Unknown frame view '{view}'")
 
 
 def read_clip(
@@ -304,6 +334,7 @@ __all__ = [
     "read_video",
     "read_clip",
     "select_frame_indices",
+    "frame_view_positions",
     "preprocess_frames",
     "encode_video_clip_batched",
     "indices_after_keyframe",

@@ -27,7 +27,7 @@ class EmbeddingConfig:
     overwrite: bool = False
     key_frame: int = 0
     normalize: bool = True
-    sampling: str = "consecutive"        # consecutive | uniform (see video.select_frame_indices)
+    sampling: str = "consecutive"        # consecutive | uniform | both (see video.select_frame_indices)
 
 
 def _select_video_id(dataset: str, item: DatasetItem) -> str:
@@ -47,6 +47,7 @@ def _save_embedding(
     sel_indices: List[int],
     *,
     normalize: bool,
+    n_frames_raw: int = -1,
 ) -> None:
     pooled = per_frame.float().mean(dim=0, keepdim=True)
     if normalize:
@@ -57,6 +58,7 @@ def _save_embedding(
         "embedding_per_frame": per_frame.to(torch.float16),
         "embedding_pooled": pooled.squeeze(0).to(torch.float16),
         "frame_indices": sel_indices,
+        "n_frames_raw": int(n_frames_raw),
         "normalized": bool(normalize),
         "dtype": "float16",
         "metadata": item.metadata,
@@ -160,7 +162,8 @@ def generate_embeddings(
                     pin_memory=cfg.pin_memory,
                     normalize=cfg.normalize,
                 )
-                _save_embedding(out_path, video_id, item, per_frame, sel_indices, normalize=cfg.normalize)
+                _save_embedding(out_path, video_id, item, per_frame, sel_indices,
+                                normalize=cfg.normalize, n_frames_raw=n_raw)
                 writer.writerow([video_id, n_raw, per_frame.shape[0], kf, str(out_path)])
                 print(f"[{idx}/{total}] saved {out_path.name} (raw={n_raw}, used={per_frame.shape[0]}, kf={kf})")
             except Exception as exc:
@@ -226,7 +229,7 @@ def main():
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--key_frame", type=int, default=0)
     parser.add_argument("--no_normalize", dest="normalize", action="store_false")
-    parser.add_argument("--sampling", choices=["consecutive", "uniform"], default="consecutive")
+    parser.add_argument("--sampling", choices=["consecutive", "uniform", "both"], default="consecutive")
     args = parser.parse_args()
 
     cfg = EmbeddingConfig(
