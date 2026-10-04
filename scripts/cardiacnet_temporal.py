@@ -35,6 +35,8 @@ def main() -> None:
     p.add_argument("--heads", nargs="+", default=["mean", "meanstd", "attn", "transformer"])
     p.add_argument("--seeds", nargs="+", default=["0", "1", "2", "3", "4"])
     p.add_argument("--bootstrap", default="2000")
+    p.add_argument("--video_models", nargs="*", default=[], choices=["panecho", "echoprime"],
+                   help="Video-level encoders: one embedding per 16-frame clip view, linear probe on it")
     args = p.parse_args()
     args.sampling, args.max_frames = "both", args.stored_max  # what embed() reads
 
@@ -53,6 +55,19 @@ def main() -> None:
                 "--views", *args.views, "--heads", *args.heads, "--seeds", *args.seeds,
                 "--exclude_col", "path", "--exclude_regex", "/PHI", "--bootstrap", args.bootstrap,
                 "--out_dir", out_dir / "probe" / task / tag])
+        for vm in args.video_models:
+            vroot = out_dir / "video_embeddings" / vm / t
+            for split in ("train", "val", "test"):
+                sh([sys.executable, "-m", "src.video_embeddings", "--dataset", f"{t}_csv", "--root", "/",
+                    "--split_csv", split_csv, "--split", split, "--model", vm, "--out_root", vroot,
+                    "--device", args.device])
+            for view in ("consecutive16", "stride2", "uniform16"):
+                sh([sys.executable, "-m", "src.linear_probe.temporal_probe", "--emb_root", vroot / view,
+                    "--labels_csv", split_csv, "--id_col", "unique_id", "--label_col", TASKS[task][1],
+                    "--pred_col", f"prob_{t}", "--task", "classification", "--views", "all",
+                    "--heads", "mean", "--reference", "all/mean", "--exclude_col", "path",
+                    "--exclude_regex", "/PHI", "--bootstrap", args.bootstrap,
+                    "--out_dir", out_dir / "probe" / task / f"{vm}-video__{view}"])
         sh([sys.executable, "scripts/echonet_analysis.py", "--results", out_dir / "probe" / task,
             "--metric", "auroc", "--filelist", REPO / TASKS[task][0], "--id_col", "unique_id",
             "--label_col", TASKS[task][1], "--pred_col", f"prob_{t}", "--B", "10000"])

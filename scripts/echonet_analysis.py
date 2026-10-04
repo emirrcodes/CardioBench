@@ -81,6 +81,8 @@ def main() -> None:
                         d = pd.read_csv(fs).set_index(args.id_col)[args.pred_col]
                         seeds.append({"model": model, "view": view, "head": head, "seed": s,
                                       M: score(ef.loc[d.index].to_numpy(), d.to_numpy())})
+        if len(preds) < 2:  # e.g. video-level encoders (one clip embedding, no frame views)
+            continue
         ids = sorted(set.intersection(*(set(p.index) for p in preds.values())))
         y = ef.loc[ids].to_numpy()
         P = {k: v.loc[ids].to_numpy() for k, v in preds.items()}
@@ -108,8 +110,12 @@ def main() -> None:
                     compare("coverage", a, b)
 
     table = pd.DataFrame(rows)
+    if table.empty:
+        print("no paired comparisons to make"); return
     table["p_holm"] = holm(table["p"].to_numpy())
     table.to_csv(args.results / "paired_comparisons.csv", index=False)
+    if not seeds:
+        print(table.round(3).to_string(index=False)); return
     seed_tab = (pd.DataFrame(seeds).groupby(["model", "view", "head"])[M]
                 .agg(["mean", "std", "min", "max"]).reset_index())
     seed_tab.to_csv(args.results / "seed_spread.csv", index=False)

@@ -25,7 +25,19 @@ def resolve_model_id(name: str) -> str:
     return MODEL_ALIASES.get(name, name)
 
 
+NON_OPENCLIP = ("panecho_frames",)  # frame encoders behind the same encode_image interface
+
+
 def load_model(cfg: ModelConfig):
+    if cfg.model == "panecho_frames":
+        import os
+
+        from .video_encoders import PanEchoFrames, panecho_frame_transform
+
+        model = PanEchoFrames(pretrained=not os.environ.get("CARDIOBENCH_NO_PRETRAINED")).to(cfg.device)
+        model = model.half() if cfg.precision == "fp16" else model.bfloat16() if cfg.precision == "bf16" else model
+        tf = panecho_frame_transform()
+        return model.eval(), tf, tf, "panecho_frames"
     model_id = resolve_model_id(cfg.model)
     model, preprocess_train, preprocess_val = create_model_and_transforms(
         model_id,
