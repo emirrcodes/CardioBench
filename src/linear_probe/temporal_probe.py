@@ -34,7 +34,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from sklearn.linear_model import LogisticRegression, Ridge
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, roc_auc_score
+from sklearn.metrics import log_loss, mean_absolute_error, mean_squared_error, r2_score, roc_auc_score
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -157,7 +157,7 @@ def train_torch_head(kind, data, task, seed, device, epochs=200, patience=15, lr
     def val_score(p):  # lower is better
         if task == "regression":
             return mean_absolute_error(yva, p)
-        return -roc_auc_score(yva, p) if len(np.unique(yva)) > 1 else 0.0
+        return -roc_auc_score(yva, p) if len(np.unique(yva)) > 1 else log_loss(yva, p, labels=[0, 1])
 
     best, best_state, bad = np.inf, None, 0
     g = torch.Generator().manual_seed(seed)
@@ -192,7 +192,9 @@ def fit_sklearn_head(task, Ftr, ytr, Fva, yva, Fte):
             s = mean_absolute_error(yva, m.predict(Fva))
         else:
             m = make_pipeline(StandardScaler(), LogisticRegression(C=g, class_weight="balanced", max_iter=5000)).fit(Ftr, ytr)
-            s = -roc_auc_score(yva, m.predict_proba(Fva)[:, 1])
+            # a tiny val split can hold one class; fall back to log-loss so C can still be chosen
+            pv = m.predict_proba(Fva)[:, 1]
+            s = -roc_auc_score(yva, pv) if len(np.unique(yva)) > 1 else log_loss(yva, pv, labels=[0, 1])
         if s < best_s:
             best, best_s = m, s
     return best.predict(Fte) if task == "regression" else best.predict_proba(Fte)[:, 1]
@@ -243,6 +245,10 @@ def run(args) -> pd.DataFrame:
 
     lab = pd.read_csv(args.labels_csv)
     lab[args.id_col] = lab[args.id_col].astype(str).str.replace(r"\.avi$", "", regex=True)
+    if args.exclude_regex:  # e.g. CardiacNet's PHI* controls: dropped from train, val and test
+        drop = lab[args.exclude_col].astype(str).str.contains(args.exclude_regex, regex=True)
+        print(f"[temporal] excluding {int(drop.sum())} rows where {args.exclude_col} ~ {args.exclude_regex!r}")
+        lab = lab[~drop]
     labels = lab.drop_duplicates(args.id_col).set_index(args.id_col)[args.label_col]
 
     data_rows = {}
@@ -323,6 +329,8 @@ def build_parser():
     p.add_argument("--reference", default="consecutive16/mean")
     p.add_argument("--zeroshot_model", default=None, help="Model alias for zero-shot EF (regression only)")
     p.add_argument("--bootstrap", type=int, default=1000)
+    p.add_argument("--exclude_col", default="path", help="labels_csv column tested by --exclude_regex")
+    p.add_argument("--exclude_regex", default=None, help="Drop label rows whose --exclude_col matches")
     p.add_argument("--out_dir", required=True)
     return p
 

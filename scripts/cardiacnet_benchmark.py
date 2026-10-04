@@ -228,7 +228,7 @@ def main() -> None:
     args = p.parse_args()
 
     out_dir = args.out_dir.resolve()
-    parent = find_cardiacnet_parent(args.data_root)
+    parent = find_cardiacnet_parent(args.data_root.resolve())
     pred_root = out_dir / "predictions"
 
     for task in args.tasks:

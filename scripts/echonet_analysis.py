@@ -1,4 +1,4 @@
-"""Paired comparisons across the EchoNet-Dynamic temporal-probe runs.
+"""Paired comparisons across temporal-probe runs (EchoNet-Dynamic EF, CardiacNet ASD/PAH).
 
 Reads ``<results>/<model>/predictions/<view>__<head>.csv`` (written by temporal_probe) and asks
 two questions per model, each with a paired bootstrap on the same resampled TEST videos and a
@@ -11,6 +11,9 @@ Also reports the seed spread of the trained heads (per-seed MAE, from ``*__seedK
 
     python scripts/echonet_analysis.py --results results/echonet_dynamic \\
         --filelist .work/echonet/FileList.csv
+    python scripts/echonet_analysis.py --results results/cardiacnet_temporal/ASD --metric auroc \\
+        --filelist data/splits/cardiacnet/cardiacnet_asd_split.csv --id_col unique_id \\
+        --label_col ASD --pred_col prob_asd
 """
 
 from __future__ import annotations
@@ -20,6 +23,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from sklearn.metrics import roc_auc_score
 
 HEADS = ("mean", "meanstd", "attn", "transformer")
 VIEWS = ("consecutive16", "uniform16", "consecutive32", "uniform32")
@@ -27,6 +31,10 @@ VIEWS = ("consecutive16", "uniform16", "consecutive32", "uniform32")
 
 def mae(y, p):
     return float(np.mean(np.abs(y - p)))
+
+
+def auroc(y, p):
+    return float(roc_auc_score(y, p)) if len(np.unique(y)) > 1 else np.nan
 
 
 def holm(pvals):
@@ -42,14 +50,20 @@ def holm(pvals):
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--results", type=Path, default=Path("results/echonet_dynamic"))
-    ap.add_argument("--filelist", type=Path, required=True)
+    ap.add_argument("--filelist", type=Path, required=True, help="Labels CSV")
+    ap.add_argument("--id_col", default="FileName")
+    ap.add_argument("--label_col", default="EF")
+    ap.add_argument("--pred_col", default="EF_pred")
+    ap.add_argument("--metric", choices=["mae", "auroc"], default="mae")
     ap.add_argument("--B", type=int, default=2000)
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
 
     fl = pd.read_csv(args.filelist)
-    fl["FileName"] = fl["FileName"].astype(str).str.replace(r"\.avi$", "", regex=True)
-    ef = fl.set_index("FileName")["EF"]
+    fl[args.id_col] = fl[args.id_col].astype(str).str.replace(r"\.avi$", "", regex=True)
+    ef = fl.drop_duplicates(args.id_col).set_index(args.id_col)[args.label_col]
+    score = mae if args.metric == "mae" else auroc
+    M = "MAE" if args.metric == "mae" else "AUROC"
 
     rows, seeds = [], []
     for model_dir in sorted(p for p in args.results.iterdir() if (p / "predictions").is_dir()):
@@ -60,13 +74,13 @@ def main() -> None:
                 f = model_dir / "predictions" / f"{view}__{head}.csv"
                 if f.exists():
                     d = pd.read_csv(f)
-                    preds[(view, head)] = d.set_index("FileName")["EF_pred"]
+                    preds[(view, head)] = d.set_index(args.id_col)[args.pred_col]
                 for s in range(10):
                     fs = model_dir / "predictions" / f"{view}__{head}__seed{s}.csv"
                     if fs.exists():
-                        d = pd.read_csv(fs).set_index("FileName")["EF_pred"]
+                        d = pd.read_csv(fs).set_index(args.id_col)[args.pred_col]
                         seeds.append({"model": model, "view": view, "head": head, "seed": s,
-                                      "MAE": mae(ef.loc[d.index].to_numpy(), d.to_numpy())})
+                                      M: score(ef.loc[d.index].to_numpy(), d.to_numpy())})
         ids = sorted(set.intersection(*(set(p.index) for p in preds.values())))
         y = ef.loc[ids].to_numpy()
         P = {k: v.loc[ids].to_numpy() for k, v in preds.items()}
@@ -74,11 +88,12 @@ def main() -> None:
         idx = [rng.integers(0, len(y), len(y)) for _ in range(args.B)]
 
         def compare(kind, a, b):
-            d = np.array([mae(y[i], P[a][i]) - mae(y[i], P[b][i]) for i in idx])
+            d = np.array([score(y[i], P[a][i]) - score(y[i], P[b][i]) for i in idx])
+            d = d[~np.isnan(d)]  # AUROC: resamples with a single class
             rows.append({
                 "model": model, "effect": kind, "config": f"{a[0]}/{a[1]}", "vs": f"{b[0]}/{b[1]}",
-                "MAE": mae(y, P[a]), "MAE_vs": mae(y, P[b]), "dMAE": mae(y, P[a]) - mae(y, P[b]),
-                "dMAE_lo": np.quantile(d, 0.025), "dMAE_hi": np.quantile(d, 0.975),
+                M: score(y, P[a]), f"{M}_vs": score(y, P[b]), f"d{M}": score(y, P[a]) - score(y, P[b]),
+                f"d{M}_lo": np.quantile(d, 0.025), f"d{M}_hi": np.quantile(d, 0.975),
                 "p": max(1.0 / args.B, min(1.0, 2 * min((d <= 0).mean(), (d >= 0).mean()))),
             })
 
@@ -95,12 +110,12 @@ def main() -> None:
     table = pd.DataFrame(rows)
     table["p_holm"] = holm(table["p"].to_numpy())
     table.to_csv(args.results / "paired_comparisons.csv", index=False)
-    seed_tab = (pd.DataFrame(seeds).groupby(["model", "view", "head"])["MAE"]
+    seed_tab = (pd.DataFrame(seeds).groupby(["model", "view", "head"])[M]
                 .agg(["mean", "std", "min", "max"]).reset_index())
     seed_tab.to_csv(args.results / "seed_spread.csv", index=False)
     pd.set_option("display.width", 200)
     print(table.round(3).to_string(index=False))
-    print("\nSeed spread of trained heads (test MAE across seeds):")
+    print(f"\nSeed spread of trained heads (test {M} across seeds):")
     print(seed_tab.round(3).to_string(index=False))
 
 
