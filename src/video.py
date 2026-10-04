@@ -190,6 +190,39 @@ def frame_view_positions(
     raise ValueError(f"Unknown frame view '{view}'")
 
 
+CYCLE_VIEWS_HELP = "edes | halfcycleN | edN"
+
+
+def is_cycle_view(view: str) -> bool:
+    return view == "edes" or view.startswith("halfcycle") or (view.startswith("ed") and view[2:].isdigit())
+
+
+def cycle_view_indices(n_frames: int, ed: int, es: int, view: str) -> List[int]:
+    """Frames anchored on the traced end-diastole (``ed``) and end-systole (``es``) frames.
+
+    ``edes``: just those two frames. ``halfcycleN``: N frames spread from one to the other
+    (systole or diastole, whichever the clip traced). ``edN``: N consecutive frames from ED.
+    """
+    last = max(n_frames - 1, 0)
+    ed, es = min(max(int(ed), 0), last), min(max(int(es), 0), last)
+    if view == "edes":
+        return sorted({ed, es})
+    if view.startswith("halfcycle"):
+        a, b = sorted((ed, es))
+        return sorted({int(round(x)) for x in np.linspace(a, b, int(view[len("halfcycle"):]))})
+    if view.startswith("ed") and view[2:].isdigit():
+        return list(range(ed, min(ed + int(view[2:]), n_frames)))
+    raise ValueError(f"Unknown cycle view '{view}' (expected {CYCLE_VIEWS_HELP})")
+
+
+def cycle_frame_indices(n_frames: int, ed: int, es: int, k: int = 16) -> List[int]:
+    """Union of ``edes``, ``halfcycle{k}`` and ``ed{k}``: what ``--sampling cycle`` embeds."""
+    out = set()
+    for view in ("edes", f"halfcycle{k}", f"ed{k}"):
+        out.update(cycle_view_indices(n_frames, ed, es, view))
+    return sorted(out)
+
+
 def read_clip(
     path: Path,
     *,
@@ -198,18 +231,23 @@ def read_clip(
     max_frames: int = 16,
     stride: int = 1,
     sampling: str = "consecutive",
+    selector=None,
 ) -> Tuple[np.ndarray, int, List[int]]:
     """
     Read only the frames selected by ``select_frame_indices``.
 
     Returns ``(frames, n_frames_raw, selected_indices)``. NIfTI volumes are memory-mapped,
     so only the selected slices are decoded instead of the whole cine (CardiacNet
-    volumes are ~100 MB each). Other formats fall back to a full read.
+    volumes are ~100 MB each). Other formats fall back to a full read. ``selector``, if
+    given, maps the clip's frame count to explicit frame indices and overrides ``sampling``.
     """
+    def pick(n):
+        return selector(n) if selector is not None else select_frame_indices(n, key_frame, max_frames, stride, sampling)
+
     if _is_nifti(path):
         img = nib.load(str(path))
         n_raw, is_rgb = _nifti_layout(img.shape)
-        sel = select_frame_indices(n_raw, key_frame, max_frames, stride, sampling)
+        sel = pick(n_raw)
         frames: List[np.ndarray] = []
         for idx in sel:
             frame = _nifti_frame(img.dataobj, img.shape, idx, is_rgb)
@@ -222,7 +260,7 @@ def read_clip(
 
     frames_all = read_video(path, res=res)
     n_raw = int(frames_all.shape[0])
-    sel = select_frame_indices(n_raw, key_frame, max_frames, stride, sampling)
+    sel = pick(n_raw)
     return frames_all[sel], n_raw, sel
 
 
@@ -335,6 +373,9 @@ __all__ = [
     "read_clip",
     "select_frame_indices",
     "frame_view_positions",
+    "cycle_view_indices",
+    "cycle_frame_indices",
+    "is_cycle_view",
     "preprocess_frames",
     "encode_video_clip_batched",
     "indices_after_keyframe",

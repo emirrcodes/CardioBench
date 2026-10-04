@@ -38,7 +38,7 @@ from sklearn.metrics import log_loss, mean_absolute_error, mean_squared_error, r
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-from ..video import frame_view_positions
+from ..video import cycle_view_indices, frame_view_positions, is_cycle_view
 
 ALPHA_GRID = (1e-1, 1.0, 10.0, 100.0, 1000.0, 10000.0)
 C_GRID = (1e-4, 1e-3, 1e-2, 1e-1, 1.0)
@@ -57,10 +57,33 @@ def load_split(split_dir: Path) -> List[dict]:
             "frames": p["embedding_per_frame"].float().detach(),
             "idx": [int(i) for i in p["frame_indices"]],
             "n_raw": int(p.get("n_frames_raw", -1)),
+            "ed": p.get("ed_frame"),
+            "es": p.get("es_frame"),
         })
     if not rows:
         raise FileNotFoundError(f"No embeddings in {split_dir}")
     return rows
+
+
+def merge_rows(row_lists: List[List[dict]]) -> List[dict]:
+    """Merge the same videos embedded in several runs (e.g. first/uniform frames + cycle frames)."""
+    by_id: Dict[str, dict] = {}
+    for rows in row_lists:
+        for r in rows:
+            m = by_id.get(r["id"])
+            if m is None:
+                by_id[r["id"]] = dict(r)
+                continue
+            have = set(m["idx"])
+            new = [i for i, f in enumerate(r["idx"]) if f not in have]
+            if new:
+                m["frames"] = torch.cat([m["frames"], r["frames"][new]])
+                m["idx"] = m["idx"] + [r["idx"][i] for i in new]
+            m["n_raw"] = max(m["n_raw"], r["n_raw"])
+            for k in ("ed", "es"):
+                if m.get(k) is None:
+                    m[k] = r.get(k)
+    return list(by_id.values())
 
 
 def build_view(rows: List[dict], view: str, stored_max: int) -> Tuple[torch.Tensor, torch.Tensor]:
@@ -68,7 +91,11 @@ def build_view(rows: List[dict], view: str, stored_max: int) -> Tuple[torch.Tens
     seqs = []
     for r in rows:
         n_raw = r["n_raw"] if r["n_raw"] > 0 else max(r["idx"]) + 1
-        pos = frame_view_positions(r["idx"], n_raw, view, stored_max=stored_max)
+        if is_cycle_view(view):
+            where = {f: i for i, f in enumerate(r["idx"])}
+            pos = [where[f] for f in cycle_view_indices(n_raw, r["ed"], r["es"], view) if f in where]
+        else:
+            pos = frame_view_positions(r["idx"], n_raw, view, stored_max=stored_max)
         seqs.append(r["frames"][pos] if pos else r["frames"][:1])
     T = max(s.shape[0] for s in seqs)
     D = seqs[0].shape[1]
@@ -128,11 +155,15 @@ class TinyTransformer(nn.Module):
         return self.head((h * m).sum(1) / m.sum(1).clamp(min=1)).squeeze(-1)
 
 
-def train_torch_head(kind, data, task, seed, device, epochs=200, patience=15, lr=1e-3, wd=1e-2, bs=128):
+def train_torch_head(kind, data, task, seed, device, epochs=200, patience=15, lr=1e-3, wd=1e-2, bs=None):
     """Fit one torch head; returns test predictions (de-standardised for regression)."""
     torch.manual_seed(seed)
     np.random.seed(seed)
     (Xtr, Mtr, ytr), (Xva, Mva, yva), (Xte, Mte, _) = data
+    # >= ~8 steps per epoch: with a fixed 128 a small train split (CardiacNet: 150-300 videos)
+    # got 1-2 steps per epoch and early stopping left the head barely trained (near-constant output).
+    # Large splits keep 128 (EchoNet: 7465 videos, unchanged).
+    bs = bs or int(max(16, min(128, len(Xtr) // 8)))
     D, T = Xtr.shape[-1], Xtr.shape[1]
     model = (AttnPool if kind == "attn" else TinyTransformer)(D, T).to(device)
     opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=wd)
@@ -253,7 +284,10 @@ def run(args) -> pd.DataFrame:
 
     data_rows = {}
     for s in SPLITS:
-        rows = [r for r in load_split(Path(args.emb_root) / s) if r["id"] in labels.index]
+        rows = merge_rows([load_split(Path(root) / s) for root in args.emb_root])
+        rows = [r for r in rows if r["id"] in labels.index]
+        if any(is_cycle_view(v) for v in args.views):  # cycle views need traced ED/ES frames
+            rows = [r for r in rows if r.get("ed") is not None and r.get("es") is not None]
         data_rows[s] = rows
         print(f"[temporal] {s}: {len(rows)} labelled videos")
     y = {s: labels.loc[[r["id"] for r in data_rows[s]]].to_numpy(dtype=float) for s in SPLITS}
@@ -316,7 +350,8 @@ def zeroshot_ef(view_test, model_id, device) -> np.ndarray:
 
 def build_parser():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--emb_root", required=True, help="Directory with train/ val/ test/ embedding folders")
+    p.add_argument("--emb_root", required=True, nargs="+",
+                   help="Directory with train/ val/ test/ embedding folders; several are merged per video")
     p.add_argument("--labels_csv", required=True)
     p.add_argument("--id_col", default="FileName")
     p.add_argument("--label_col", default="EF")

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional
+from typing import Dict, Iterable, List, Optional, Tuple
 import csv
 
 import torch
@@ -10,7 +10,7 @@ import torch.nn.functional as F
 
 from .datasets import DatasetLoader, DatasetItem
 from .models import ModelConfig, load_model
-from .video import read_clip, preprocess_frames, encode_video_clip_batched
+from .video import cycle_frame_indices, read_clip, preprocess_frames, encode_video_clip_batched
 
 
 @dataclass
@@ -27,7 +27,8 @@ class EmbeddingConfig:
     overwrite: bool = False
     key_frame: int = 0
     normalize: bool = True
-    sampling: str = "consecutive"        # consecutive | uniform | both (see video.select_frame_indices)
+    sampling: str = "consecutive"        # consecutive | uniform | both | cycle (see video.py)
+    keyframes: Optional[Dict[str, Tuple[int, int]]] = None  # video_id -> (ED, ES) frame, for "cycle"
 
 
 def _select_video_id(dataset: str, item: DatasetItem) -> str:
@@ -48,6 +49,7 @@ def _save_embedding(
     *,
     normalize: bool,
     n_frames_raw: int = -1,
+    extra: Optional[dict] = None,
 ) -> None:
     pooled = per_frame.float().mean(dim=0, keepdim=True)
     if normalize:
@@ -62,6 +64,7 @@ def _save_embedding(
         "normalized": bool(normalize),
         "dtype": "float16",
         "metadata": item.metadata,
+        **(extra or {}),
     }
     torch.save(payload, out_path)
 
@@ -140,6 +143,16 @@ def generate_embeddings(
             kf_default = item.key_frame if item.key_frame is not None else cfg.key_frame
             kf = key_map.get(video_id, kf_default)
 
+            selector, extra = None, None
+            if cfg.sampling == "cycle":
+                if not cfg.keyframes or video_id not in cfg.keyframes:
+                    writer.writerow([video_id, -1, -1, kf, "NO_KEYFRAMES"])
+                    print(f"[{idx}/{total}] skip {video_id}: no ED/ES keyframes")
+                    continue
+                ed, es = cfg.keyframes[video_id]
+                selector = lambda n, ed=ed, es=es: cycle_frame_indices(n, ed, es, cfg.max_frames)
+                extra = {"ed_frame": int(ed), "es_frame": int(es)}
+
             try:
                 frames_sel, n_raw, sel_indices = read_clip(
                     item.path,
@@ -148,6 +161,7 @@ def generate_embeddings(
                     max_frames=cfg.max_frames,
                     stride=cfg.stride,
                     sampling=cfg.sampling,
+                    selector=selector,
                 )
                 if not sel_indices:
                     raise RuntimeError(f"No frames selected (n_raw={n_raw}, key_frame={kf}).")
@@ -163,7 +177,7 @@ def generate_embeddings(
                     normalize=cfg.normalize,
                 )
                 _save_embedding(out_path, video_id, item, per_frame, sel_indices,
-                                normalize=cfg.normalize, n_frames_raw=n_raw)
+                                normalize=cfg.normalize, n_frames_raw=n_raw, extra=extra)
                 writer.writerow([video_id, n_raw, per_frame.shape[0], kf, str(out_path)])
                 print(f"[{idx}/{total}] saved {out_path.name} (raw={n_raw}, used={per_frame.shape[0]}, kf={kf})")
             except Exception as exc:
@@ -203,6 +217,11 @@ def generate_embeddings_for_splits(
         )
 
 
+def _read_keyframes(path: str) -> Dict[str, Tuple[int, int]]:
+    with open(path, newline="") as handle:
+        return {r["video_id"]: (int(r["ed"]), int(r["es"])) for r in csv.DictReader(handle)}
+
+
 def main():
     import argparse
 
@@ -229,7 +248,9 @@ def main():
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--key_frame", type=int, default=0)
     parser.add_argument("--no_normalize", dest="normalize", action="store_false")
-    parser.add_argument("--sampling", choices=["consecutive", "uniform", "both"], default="consecutive")
+    parser.add_argument("--sampling", choices=["consecutive", "uniform", "both", "cycle"], default="consecutive")
+    parser.add_argument("--keyframes_csv", default=None,
+                        help="CSV with video_id, ed, es frame columns (required for --sampling cycle)")
     args = parser.parse_args()
 
     cfg = EmbeddingConfig(
@@ -246,6 +267,7 @@ def main():
         key_frame=args.key_frame,
         normalize=bool(getattr(args, "normalize", True)),
         sampling=args.sampling,
+        keyframes=_read_keyframes(args.keyframes_csv) if args.keyframes_csv else None,
     )
 
     if args.splits:
