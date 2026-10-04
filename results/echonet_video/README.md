@@ -8,3 +8,7 @@ sampling), `uniform16` (16 frames over the whole clip). Probe: ridge on the clip
 
 Note: PanEcho's training tasks include EF (on its own Yale data), so its embedding is tuned to EF.
 EchoPrime comes from the EchoNet group (Cedars-Sinai); whether its pretraining data overlaps EchoNet-Dynamic was not checked.
+
+`paired_vs_best_frame.txt`: paired bootstrap (B = 10,000) of the video embeddings against frame-level
+setups. On the same 16 frames, PanEcho's own temporal transformer equals a small transformer head
+trained on PanEcho's frame features (−0.04 MAE, p = 0.76); both beat the frame mean by ~1.4 MAE.

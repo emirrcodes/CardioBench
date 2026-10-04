@@ -1,88 +1,116 @@
-      model   effect                    config                        vs   MAE  MAE_vs   dMAE  dMAE_lo  dMAE_hi     p  p_holm
-biomed_clip     head     consecutive16/meanstd        consecutive16/mean 7.739   7.854 -0.116   -0.321    0.094 0.270   1.000
-biomed_clip     head        consecutive16/attn        consecutive16/mean 7.340   7.854 -0.515   -0.800   -0.221 0.000   0.007
-biomed_clip     head consecutive16/transformer        consecutive16/mean 7.211   7.854 -0.643   -0.936   -0.346 0.000   0.006
-biomed_clip     head         uniform16/meanstd            uniform16/mean 7.704   7.659  0.046   -0.177    0.266 0.673   1.000
-biomed_clip     head            uniform16/attn            uniform16/mean 6.924   7.659 -0.735   -1.005   -0.461 0.000   0.006
-biomed_clip     head     uniform16/transformer            uniform16/mean 6.670   7.659 -0.989   -1.288   -0.684 0.000   0.006
-biomed_clip     head     consecutive32/meanstd        consecutive32/mean 7.350   7.536 -0.186   -0.400    0.031 0.092   1.000
-biomed_clip     head        consecutive32/attn        consecutive32/mean 6.985   7.536 -0.551   -0.822   -0.272 0.000   0.006
-biomed_clip     head consecutive32/transformer        consecutive32/mean 6.902   7.536 -0.634   -0.932   -0.334 0.000   0.006
-biomed_clip     head         uniform32/meanstd            uniform32/mean 7.484   7.616 -0.132   -0.336    0.073 0.197   1.000
-biomed_clip     head            uniform32/attn            uniform32/mean 6.910   7.616 -0.706   -0.978   -0.429 0.000   0.006
-biomed_clip     head     uniform32/transformer            uniform32/mean 6.614   7.616 -1.002   -1.297   -0.702 0.000   0.006
-biomed_clip coverage            uniform16/mean        consecutive16/mean 7.659   7.854 -0.196   -0.378   -0.008 0.040   0.995
-biomed_clip coverage         uniform16/meanstd     consecutive16/meanstd 7.704   7.739 -0.034   -0.313    0.248 0.812   1.000
-biomed_clip coverage            uniform16/attn        consecutive16/attn 6.924   7.340 -0.416   -0.668   -0.164 0.001   0.041
-biomed_clip coverage     uniform16/transformer consecutive16/transformer 6.670   7.211 -0.542   -0.799   -0.286 0.000   0.006
-biomed_clip coverage            uniform32/mean        consecutive32/mean 7.616   7.536  0.080   -0.053    0.215 0.237   1.000
-biomed_clip coverage         uniform32/meanstd     consecutive32/meanstd 7.484   7.350  0.134   -0.102    0.372 0.254   1.000
-biomed_clip coverage            uniform32/attn        consecutive32/attn 6.910   6.985 -0.075   -0.280    0.128 0.472   1.000
-biomed_clip coverage     uniform32/transformer consecutive32/transformer 6.614   6.902 -0.288   -0.503   -0.069 0.010   0.298
-  echo_clip     head     consecutive16/meanstd        consecutive16/mean 6.069   6.089 -0.020   -0.154    0.118 0.786   1.000
-  echo_clip     head        consecutive16/attn        consecutive16/mean 5.597   6.089 -0.491   -0.665   -0.320 0.000   0.006
-  echo_clip     head consecutive16/transformer        consecutive16/mean 5.386   6.089 -0.703   -0.873   -0.533 0.000   0.006
-  echo_clip     head         uniform16/meanstd            uniform16/mean 5.874   6.016 -0.143   -0.278   -0.009 0.037   0.988
-  echo_clip     head            uniform16/attn            uniform16/mean 5.338   6.016 -0.678   -0.841   -0.515 0.000   0.006
-  echo_clip     head     uniform16/transformer            uniform16/mean 5.339   6.016 -0.677   -0.885   -0.475 0.000   0.006
-  echo_clip     head     consecutive32/meanstd        consecutive32/mean 5.732   5.857 -0.125   -0.242   -0.006 0.038   0.988
-  echo_clip     head        consecutive32/attn        consecutive32/mean 5.357   5.857 -0.500   -0.641   -0.358 0.000   0.006
-  echo_clip     head consecutive32/transformer        consecutive32/mean 5.234   5.857 -0.622   -0.796   -0.444 0.000   0.006
-  echo_clip     head         uniform32/meanstd            uniform32/mean 5.897   5.991 -0.094   -0.238    0.047 0.196   1.000
-  echo_clip     head            uniform32/attn            uniform32/mean 5.364   5.991 -0.627   -0.785   -0.468 0.000   0.006
-  echo_clip     head     uniform32/transformer            uniform32/mean 5.247   5.991 -0.744   -0.937   -0.547 0.000   0.006
-  echo_clip coverage            uniform16/mean        consecutive16/mean 6.016   6.089 -0.073   -0.184    0.038 0.197   1.000
-  echo_clip coverage         uniform16/meanstd     consecutive16/meanstd 5.874   6.069 -0.195   -0.375   -0.020 0.029   0.823
-  echo_clip coverage            uniform16/attn        consecutive16/attn 5.338   5.597 -0.259   -0.423   -0.091 0.002   0.070
-  echo_clip coverage     uniform16/transformer consecutive16/transformer 5.339   5.386 -0.047   -0.240    0.141 0.619   1.000
-  echo_clip coverage            uniform32/mean        consecutive32/mean 5.991   5.857  0.134    0.054    0.216 0.002   0.059
-  echo_clip coverage         uniform32/meanstd     consecutive32/meanstd 5.897   5.732  0.165    0.024    0.312 0.025   0.725
-  echo_clip coverage            uniform32/attn        consecutive32/attn 5.364   5.357  0.007   -0.110    0.122 0.910   1.000
-  echo_clip coverage     uniform32/transformer consecutive32/transformer 5.247   5.234  0.012   -0.147    0.170 0.885   1.000
-    siglip2     head     consecutive16/meanstd        consecutive16/mean 7.943   7.975 -0.032   -0.217    0.150 0.747   1.000
-    siglip2     head        consecutive16/attn        consecutive16/mean 7.117   7.975 -0.858   -1.067   -0.644 0.000   0.006
-    siglip2     head consecutive16/transformer        consecutive16/mean 7.142   7.975 -0.833   -1.078   -0.585 0.000   0.006
-    siglip2     head         uniform16/meanstd            uniform16/mean 7.645   7.678 -0.034   -0.207    0.142 0.715   1.000
-    siglip2     head            uniform16/attn            uniform16/mean 7.049   7.678 -0.630   -0.867   -0.387 0.000   0.006
-    siglip2     head     uniform16/transformer            uniform16/mean 6.897   7.678 -0.781   -1.032   -0.528 0.000   0.006
-    siglip2     head     consecutive32/meanstd        consecutive32/mean 7.508   7.608 -0.100   -0.297    0.100 0.318   1.000
-    siglip2     head        consecutive32/attn        consecutive32/mean 6.774   7.608 -0.834   -1.096   -0.573 0.000   0.006
-    siglip2     head consecutive32/transformer        consecutive32/mean 6.744   7.608 -0.864   -1.131   -0.587 0.000   0.006
-    siglip2     head         uniform32/meanstd            uniform32/mean 7.578   7.639 -0.062   -0.245    0.120 0.513   1.000
-    siglip2     head            uniform32/attn            uniform32/mean 6.770   7.639 -0.870   -1.107   -0.630 0.000   0.006
-    siglip2     head     uniform32/transformer            uniform32/mean 6.709   7.639 -0.931   -1.159   -0.699 0.000   0.006
-    siglip2 coverage            uniform16/mean        consecutive16/mean 7.678   7.975 -0.296   -0.453   -0.134 0.000   0.014
-    siglip2 coverage         uniform16/meanstd     consecutive16/meanstd 7.645   7.943 -0.298   -0.539   -0.049 0.016   0.492
-    siglip2 coverage            uniform16/attn        consecutive16/attn 7.049   7.117 -0.068   -0.303    0.166 0.570   1.000
-    siglip2 coverage     uniform16/transformer consecutive16/transformer 6.897   7.142 -0.245   -0.496    0.004 0.054   1.000
-    siglip2 coverage            uniform32/mean        consecutive32/mean 7.639   7.608  0.031   -0.125    0.191 0.685   1.000
-    siglip2 coverage         uniform32/meanstd     consecutive32/meanstd 7.578   7.508  0.070   -0.131    0.275 0.493   1.000
-    siglip2 coverage            uniform32/attn        consecutive32/attn 6.770   6.774 -0.004   -0.208    0.198 0.969   1.000
-    siglip2 coverage     uniform32/transformer consecutive32/transformer 6.709   6.744 -0.035   -0.241    0.177 0.734   1.000
+         model   effect                    config                        vs   MAE  MAE_vs   dMAE  dMAE_lo  dMAE_hi     p  p_holm
+   biomed_clip     head     consecutive16/meanstd        consecutive16/mean 7.739   7.854 -0.116   -0.321    0.094 0.270   1.000
+   biomed_clip     head        consecutive16/attn        consecutive16/mean 7.340   7.854 -0.515   -0.800   -0.221 0.000   0.008
+   biomed_clip     head consecutive16/transformer        consecutive16/mean 7.211   7.854 -0.643   -0.936   -0.346 0.000   0.008
+   biomed_clip     head         uniform16/meanstd            uniform16/mean 7.704   7.659  0.046   -0.177    0.266 0.673   1.000
+   biomed_clip     head            uniform16/attn            uniform16/mean 6.924   7.659 -0.735   -1.005   -0.461 0.000   0.008
+   biomed_clip     head     uniform16/transformer            uniform16/mean 6.670   7.659 -0.989   -1.288   -0.684 0.000   0.008
+   biomed_clip     head     consecutive32/meanstd        consecutive32/mean 7.350   7.536 -0.186   -0.400    0.031 0.092   1.000
+   biomed_clip     head        consecutive32/attn        consecutive32/mean 6.985   7.536 -0.551   -0.822   -0.272 0.000   0.008
+   biomed_clip     head consecutive32/transformer        consecutive32/mean 6.902   7.536 -0.634   -0.932   -0.334 0.000   0.008
+   biomed_clip     head         uniform32/meanstd            uniform32/mean 7.484   7.616 -0.132   -0.336    0.073 0.197   1.000
+   biomed_clip     head            uniform32/attn            uniform32/mean 6.910   7.616 -0.706   -0.978   -0.429 0.000   0.008
+   biomed_clip     head     uniform32/transformer            uniform32/mean 6.614   7.616 -1.002   -1.297   -0.702 0.000   0.008
+   biomed_clip coverage            uniform16/mean        consecutive16/mean 7.659   7.854 -0.196   -0.378   -0.008 0.040   1.000
+   biomed_clip coverage         uniform16/meanstd     consecutive16/meanstd 7.704   7.739 -0.034   -0.313    0.248 0.812   1.000
+   biomed_clip coverage            uniform16/attn        consecutive16/attn 6.924   7.340 -0.416   -0.668   -0.164 0.001   0.047
+   biomed_clip coverage     uniform16/transformer consecutive16/transformer 6.670   7.211 -0.542   -0.799   -0.286 0.000   0.008
+   biomed_clip coverage            uniform32/mean        consecutive32/mean 7.616   7.536  0.080   -0.053    0.215 0.237   1.000
+   biomed_clip coverage         uniform32/meanstd     consecutive32/meanstd 7.484   7.350  0.134   -0.102    0.372 0.254   1.000
+   biomed_clip coverage            uniform32/attn        consecutive32/attn 6.910   6.985 -0.075   -0.280    0.128 0.472   1.000
+   biomed_clip coverage     uniform32/transformer consecutive32/transformer 6.614   6.902 -0.288   -0.503   -0.069 0.010   0.336
+     echo_clip     head     consecutive16/meanstd        consecutive16/mean 6.069   6.089 -0.020   -0.154    0.118 0.786   1.000
+     echo_clip     head        consecutive16/attn        consecutive16/mean 5.597   6.089 -0.491   -0.665   -0.320 0.000   0.008
+     echo_clip     head consecutive16/transformer        consecutive16/mean 5.386   6.089 -0.703   -0.873   -0.533 0.000   0.008
+     echo_clip     head         uniform16/meanstd            uniform16/mean 5.874   6.016 -0.143   -0.278   -0.009 0.037   1.000
+     echo_clip     head            uniform16/attn            uniform16/mean 5.338   6.016 -0.678   -0.841   -0.515 0.000   0.008
+     echo_clip     head     uniform16/transformer            uniform16/mean 5.339   6.016 -0.677   -0.885   -0.475 0.000   0.008
+     echo_clip     head     consecutive32/meanstd        consecutive32/mean 5.732   5.857 -0.125   -0.242   -0.006 0.038   1.000
+     echo_clip     head        consecutive32/attn        consecutive32/mean 5.357   5.857 -0.500   -0.641   -0.358 0.000   0.008
+     echo_clip     head consecutive32/transformer        consecutive32/mean 5.234   5.857 -0.622   -0.796   -0.444 0.000   0.008
+     echo_clip     head         uniform32/meanstd            uniform32/mean 5.897   5.991 -0.094   -0.238    0.047 0.196   1.000
+     echo_clip     head            uniform32/attn            uniform32/mean 5.364   5.991 -0.627   -0.785   -0.468 0.000   0.008
+     echo_clip     head     uniform32/transformer            uniform32/mean 5.247   5.991 -0.744   -0.937   -0.547 0.000   0.008
+     echo_clip coverage            uniform16/mean        consecutive16/mean 6.016   6.089 -0.073   -0.184    0.038 0.197   1.000
+     echo_clip coverage         uniform16/meanstd     consecutive16/meanstd 5.874   6.069 -0.195   -0.375   -0.020 0.029   0.941
+     echo_clip coverage            uniform16/attn        consecutive16/attn 5.338   5.597 -0.259   -0.423   -0.091 0.002   0.081
+     echo_clip coverage     uniform16/transformer consecutive16/transformer 5.339   5.386 -0.047   -0.240    0.141 0.619   1.000
+     echo_clip coverage            uniform32/mean        consecutive32/mean 5.991   5.857  0.134    0.054    0.216 0.002   0.068
+     echo_clip coverage         uniform32/meanstd     consecutive32/meanstd 5.897   5.732  0.165    0.024    0.312 0.025   0.825
+     echo_clip coverage            uniform32/attn        consecutive32/attn 5.364   5.357  0.007   -0.110    0.122 0.910   1.000
+     echo_clip coverage     uniform32/transformer consecutive32/transformer 5.247   5.234  0.012   -0.147    0.170 0.885   1.000
+panecho_frames     head     consecutive16/meanstd        consecutive16/mean 6.373   6.909 -0.536   -0.738   -0.334 0.000   0.008
+panecho_frames     head        consecutive16/attn        consecutive16/mean 5.763   6.909 -1.146   -1.368   -0.924 0.000   0.008
+panecho_frames     head consecutive16/transformer        consecutive16/mean 5.575   6.909 -1.334   -1.587   -1.083 0.000   0.008
+panecho_frames     head         uniform16/meanstd            uniform16/mean 5.924   6.761 -0.837   -1.045   -0.632 0.000   0.008
+panecho_frames     head            uniform16/attn            uniform16/mean 5.346   6.761 -1.414   -1.637   -1.186 0.000   0.008
+panecho_frames     head     uniform16/transformer            uniform16/mean 5.005   6.761 -1.756   -2.011   -1.490 0.000   0.008
+panecho_frames     head     consecutive32/meanstd        consecutive32/mean 5.852   6.591 -0.738   -0.950   -0.530 0.000   0.008
+panecho_frames     head        consecutive32/attn        consecutive32/mean 5.281   6.591 -1.310   -1.526   -1.096 0.000   0.008
+panecho_frames     head consecutive32/transformer        consecutive32/mean 5.091   6.591 -1.500   -1.749   -1.250 0.000   0.008
+panecho_frames     head         uniform32/meanstd            uniform32/mean 5.835   6.755 -0.920   -1.124   -0.717 0.000   0.008
+panecho_frames     head            uniform32/attn            uniform32/mean 5.252   6.755 -1.504   -1.735   -1.263 0.000   0.008
+panecho_frames     head     uniform32/transformer            uniform32/mean 4.939   6.755 -1.816   -2.071   -1.558 0.000   0.008
+panecho_frames coverage            uniform16/mean        consecutive16/mean 6.761   6.909 -0.148   -0.309    0.013 0.072   1.000
+panecho_frames coverage         uniform16/meanstd     consecutive16/meanstd 5.924   6.373 -0.449   -0.635   -0.266 0.000   0.008
+panecho_frames coverage            uniform16/attn        consecutive16/attn 5.346   5.763 -0.416   -0.595   -0.241 0.000   0.008
+panecho_frames coverage     uniform16/transformer consecutive16/transformer 5.005   5.575 -0.570   -0.781   -0.363 0.000   0.008
+panecho_frames coverage            uniform32/mean        consecutive32/mean 6.755   6.591  0.164    0.045    0.283 0.007   0.259
+panecho_frames coverage         uniform32/meanstd     consecutive32/meanstd 5.835   5.852 -0.017   -0.164    0.129 0.825   1.000
+panecho_frames coverage            uniform32/attn        consecutive32/attn 5.252   5.281 -0.029   -0.169    0.113 0.675   1.000
+panecho_frames coverage     uniform32/transformer consecutive32/transformer 4.939   5.091 -0.151   -0.340    0.041 0.121   1.000
+       siglip2     head     consecutive16/meanstd        consecutive16/mean 7.943   7.975 -0.032   -0.217    0.150 0.747   1.000
+       siglip2     head        consecutive16/attn        consecutive16/mean 7.117   7.975 -0.858   -1.067   -0.644 0.000   0.008
+       siglip2     head consecutive16/transformer        consecutive16/mean 7.142   7.975 -0.833   -1.078   -0.585 0.000   0.008
+       siglip2     head         uniform16/meanstd            uniform16/mean 7.645   7.678 -0.034   -0.207    0.142 0.715   1.000
+       siglip2     head            uniform16/attn            uniform16/mean 7.049   7.678 -0.630   -0.867   -0.387 0.000   0.008
+       siglip2     head     uniform16/transformer            uniform16/mean 6.897   7.678 -0.781   -1.032   -0.528 0.000   0.008
+       siglip2     head     consecutive32/meanstd        consecutive32/mean 7.508   7.608 -0.100   -0.297    0.100 0.318   1.000
+       siglip2     head        consecutive32/attn        consecutive32/mean 6.774   7.608 -0.834   -1.096   -0.573 0.000   0.008
+       siglip2     head consecutive32/transformer        consecutive32/mean 6.744   7.608 -0.864   -1.131   -0.587 0.000   0.008
+       siglip2     head         uniform32/meanstd            uniform32/mean 7.578   7.639 -0.062   -0.245    0.120 0.513   1.000
+       siglip2     head            uniform32/attn            uniform32/mean 6.770   7.639 -0.870   -1.107   -0.630 0.000   0.008
+       siglip2     head     uniform32/transformer            uniform32/mean 6.709   7.639 -0.931   -1.159   -0.699 0.000   0.008
+       siglip2 coverage            uniform16/mean        consecutive16/mean 7.678   7.975 -0.296   -0.453   -0.134 0.000   0.016
+       siglip2 coverage         uniform16/meanstd     consecutive16/meanstd 7.645   7.943 -0.298   -0.539   -0.049 0.016   0.558
+       siglip2 coverage            uniform16/attn        consecutive16/attn 7.049   7.117 -0.068   -0.303    0.166 0.570   1.000
+       siglip2 coverage     uniform16/transformer consecutive16/transformer 6.897   7.142 -0.245   -0.496    0.004 0.054   1.000
+       siglip2 coverage            uniform32/mean        consecutive32/mean 7.639   7.608  0.031   -0.125    0.191 0.685   1.000
+       siglip2 coverage         uniform32/meanstd     consecutive32/meanstd 7.578   7.508  0.070   -0.131    0.275 0.493   1.000
+       siglip2 coverage            uniform32/attn        consecutive32/attn 6.770   6.774 -0.004   -0.208    0.198 0.969   1.000
+       siglip2 coverage     uniform32/transformer consecutive32/transformer 6.709   6.744 -0.035   -0.241    0.177 0.734   1.000
 
 Seed spread of trained heads (test MAE across seeds):
-      model          view        head  mean   std   min   max
-biomed_clip consecutive16        attn 7.399 0.091 7.314 7.496
-biomed_clip consecutive16 transformer 7.273 0.052 7.238 7.332
-biomed_clip consecutive32        attn 7.026 0.035 7.002 7.066
-biomed_clip consecutive32 transformer 7.070 0.050 7.015 7.113
-biomed_clip     uniform16        attn 7.003 0.028 6.978 7.033
-biomed_clip     uniform16 transformer 6.854 0.045 6.805 6.895
-biomed_clip     uniform32        attn 6.982 0.010 6.972 6.992
-biomed_clip     uniform32 transformer 6.792 0.032 6.757 6.818
-  echo_clip consecutive16        attn 5.679 0.032 5.656 5.715
-  echo_clip consecutive16 transformer 5.457 0.078 5.384 5.540
-  echo_clip consecutive32        attn 5.443 0.020 5.430 5.466
-  echo_clip consecutive32 transformer 5.338 0.071 5.258 5.393
-  echo_clip     uniform16        attn 5.430 0.013 5.418 5.444
-  echo_clip     uniform16 transformer 5.519 0.025 5.494 5.543
-  echo_clip     uniform32        attn 5.416 0.044 5.371 5.459
-  echo_clip     uniform32 transformer 5.370 0.027 5.340 5.394
-    siglip2 consecutive16        attn 7.170 0.023 7.150 7.195
-    siglip2 consecutive16 transformer 7.308 0.085 7.254 7.405
-    siglip2 consecutive32        attn 6.837 0.049 6.788 6.886
-    siglip2 consecutive32 transformer 7.044 0.083 6.986 7.139
-    siglip2     uniform16        attn 7.124 0.054 7.062 7.164
-    siglip2     uniform16 transformer 7.076 0.088 6.990 7.165
-    siglip2     uniform32        attn 6.838 0.052 6.779 6.877
-    siglip2     uniform32 transformer 6.884 0.045 6.843 6.932
+         model          view        head  mean   std   min   max
+   biomed_clip consecutive16        attn 7.399 0.091 7.314 7.496
+   biomed_clip consecutive16 transformer 7.273 0.052 7.238 7.332
+   biomed_clip consecutive32        attn 7.026 0.035 7.002 7.066
+   biomed_clip consecutive32 transformer 7.070 0.050 7.015 7.113
+   biomed_clip     uniform16        attn 7.003 0.028 6.978 7.033
+   biomed_clip     uniform16 transformer 6.854 0.045 6.805 6.895
+   biomed_clip     uniform32        attn 6.982 0.010 6.972 6.992
+   biomed_clip     uniform32 transformer 6.792 0.032 6.757 6.818
+     echo_clip consecutive16        attn 5.679 0.032 5.656 5.715
+     echo_clip consecutive16 transformer 5.457 0.078 5.384 5.540
+     echo_clip consecutive32        attn 5.443 0.020 5.430 5.466
+     echo_clip consecutive32 transformer 5.338 0.071 5.258 5.393
+     echo_clip     uniform16        attn 5.430 0.013 5.418 5.444
+     echo_clip     uniform16 transformer 5.519 0.025 5.494 5.543
+     echo_clip     uniform32        attn 5.416 0.044 5.371 5.459
+     echo_clip     uniform32 transformer 5.370 0.027 5.340 5.394
+panecho_frames consecutive16        attn 5.853 0.035 5.812 5.876
+panecho_frames consecutive16 transformer 5.664 0.031 5.629 5.683
+panecho_frames consecutive32        attn 5.345 0.038 5.316 5.388
+panecho_frames consecutive32 transformer 5.184 0.058 5.131 5.246
+panecho_frames     uniform16        attn 5.436 0.060 5.368 5.479
+panecho_frames     uniform16 transformer 5.114 0.125 4.982 5.231
+panecho_frames     uniform32        attn 5.321 0.086 5.269 5.421
+panecho_frames     uniform32 transformer 5.071 0.032 5.037 5.099
+       siglip2 consecutive16        attn 7.170 0.023 7.150 7.195
+       siglip2 consecutive16 transformer 7.308 0.085 7.254 7.405
+       siglip2 consecutive32        attn 6.837 0.049 6.788 6.886
+       siglip2 consecutive32 transformer 7.044 0.083 6.986 7.139
+       siglip2     uniform16        attn 7.124 0.054 7.062 7.164
+       siglip2     uniform16 transformer 7.076 0.088 6.990 7.165
+       siglip2     uniform32        attn 6.838 0.052 6.779 6.877
+       siglip2     uniform32 transformer 6.884 0.045 6.843 6.932
