@@ -1,0 +1,28 @@
+{
+ "emb_root": [
+  "/kaggle/working/cf/video_embeddings/echoprime/pah/uniform16"
+ ],
+ "labels_csv": "/kaggle/working/cf/splits/pah_split.csv",
+ "id_col": "unique_id",
+ "label_col": "PAH",
+ "pred_col": "prob_pah",
+ "task": "classification",
+ "stored_max": 32,
+ "views": [
+  "all"
+ ],
+ "heads": [
+  "mean"
+ ],
+ "seeds": [
+  0,
+  1,
+  2
+ ],
+ "reference": "all/mean",
+ "zeroshot_model": null,
+ "bootstrap": 2000,
+ "exclude_col": "path",
+ "exclude_regex": "/PHI",
+ "out_dir": "/kaggle/working/cf/probe/PAH/echoprime-video__uniform16"
+}

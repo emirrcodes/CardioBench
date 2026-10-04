@@ -1,0 +1,28 @@
+{
+ "emb_root": [
+  "/kaggle/working/cf/video_embeddings/panecho/asd/consecutive16"
+ ],
+ "labels_csv": "/kaggle/working/cf/splits/asd_split.csv",
+ "id_col": "unique_id",
+ "label_col": "ASD",
+ "pred_col": "prob_asd",
+ "task": "classification",
+ "stored_max": 32,
+ "views": [
+  "all"
+ ],
+ "heads": [
+  "mean"
+ ],
+ "seeds": [
+  0,
+  1,
+  2
+ ],
+ "reference": "all/mean",
+ "zeroshot_model": null,
+ "bootstrap": 2000,
+ "exclude_col": "path",
+ "exclude_regex": "/PHI",
+ "out_dir": "/kaggle/working/cf/probe/ASD/panecho-video__consecutive16"
+}
