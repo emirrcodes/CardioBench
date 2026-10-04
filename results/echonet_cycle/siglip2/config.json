@@ -1,0 +1,36 @@
+{
+ "emb_root": [
+  ".work/echonet/embeddings/siglip2",
+  ".work/echonet_runs/cycle/siglip2"
+ ],
+ "labels_csv": ".work/echonet/FileList.csv",
+ "id_col": "FileName",
+ "label_col": "EF",
+ "pred_col": "EF_pred",
+ "task": "regression",
+ "stored_max": 32,
+ "views": [
+  "consecutive16",
+  "uniform16",
+  "edes",
+  "halfcycle16",
+  "ed16"
+ ],
+ "heads": [
+  "mean",
+  "meanstd",
+  "attn",
+  "transformer"
+ ],
+ "seeds": [
+  0,
+  1,
+  2
+ ],
+ "reference": "consecutive16/mean",
+ "zeroshot_model": null,
+ "bootstrap": 1000,
+ "exclude_col": "path",
+ "exclude_regex": null,
+ "out_dir": ".work/echonet/probe_cycle/siglip2"
+}

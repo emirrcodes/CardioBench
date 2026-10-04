@@ -5,7 +5,9 @@ two questions per model, each with a paired bootstrap on the same resampled TEST
 Holm correction over every comparison in the table:
 
 * head effect     -- attn / transformer / meanstd vs mean, at a fixed frame view;
-* coverage effect -- uniformN vs consecutiveN, at a fixed head.
+* coverage effect -- uniformN vs consecutiveN, at a fixed head;
+* cycle effect    -- ED/ES-anchored views (edes, halfcycle16, ed16) vs consecutive16, and
+  halfcycle16 vs uniform16, at a fixed head (only when cycle views were probed).
 
 Also reports the seed spread of the trained heads (per-seed MAE, from ``*__seedK.csv``).
 
@@ -26,7 +28,9 @@ import pandas as pd
 from sklearn.metrics import roc_auc_score
 
 HEADS = ("mean", "meanstd", "attn", "transformer")
-VIEWS = ("consecutive16", "uniform16", "consecutive32", "uniform32")
+VIEWS = ("consecutive16", "uniform16", "consecutive32", "uniform32", "edes", "halfcycle16", "ed16")
+CYCLE_PAIRS = (("edes", "consecutive16"), ("halfcycle16", "consecutive16"), ("ed16", "consecutive16"),
+               ("halfcycle16", "uniform16"))
 
 
 def mae(y, p):
@@ -108,6 +112,10 @@ def main() -> None:
                 a, b = (f"uniform{n}", head), (f"consecutive{n}", head)
                 if a in P and b in P:
                     compare("coverage", a, b)
+        for va, vb in CYCLE_PAIRS:
+            for head in HEADS:
+                if (va, head) in P and (vb, head) in P:
+                    compare("cycle", (va, head), (vb, head))
 
     table = pd.DataFrame(rows)
     if table.empty:
