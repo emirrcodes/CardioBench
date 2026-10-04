@@ -1,0 +1,36 @@
+{
+ "emb_root": [
+  "/kaggle/working/ct/embeddings/biomed_clip/pah"
+ ],
+ "labels_csv": "/kaggle/working/ct/splits/pah_split.csv",
+ "id_col": "unique_id",
+ "label_col": "PAH",
+ "pred_col": "prob_pah",
+ "task": "classification",
+ "stored_max": 32,
+ "views": [
+  "consecutive16",
+  "uniform16",
+  "consecutive32",
+  "uniform32"
+ ],
+ "heads": [
+  "mean",
+  "meanstd",
+  "attn",
+  "transformer"
+ ],
+ "seeds": [
+  0,
+  1,
+  2,
+  3,
+  4
+ ],
+ "reference": "consecutive16/mean",
+ "zeroshot_model": null,
+ "bootstrap": 2000,
+ "exclude_col": "path",
+ "exclude_regex": "/PHI",
+ "out_dir": "/kaggle/working/ct/probe/PAH/biomed_clip"
+}
